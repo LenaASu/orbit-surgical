@@ -1,27 +1,52 @@
-![ORBIT-Surgical](media/teaser.png)
 
-# ORBIT-Surgical Extensions for RL/IL 
+# ORBIT-Surgical Extensions for RL/IL on the Lift Needle Task
 
 [![IsaacSim](https://img.shields.io/badge/IsaacSim-4.5.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
 [![Isaac Lab](https://img.shields.io/badge/IsaacLab-2.x-silver)](https://isaac-sim.github.io/IsaacLab)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-orange.svg)](https://releases.ubuntu.com/22.04/)
 
-This repository is forked from ORBIT-Surgical and extended with:
-- trajectory export
+This repository is forked from ORBIT-Surgical and extended with the following features for the Lift Needle task:
+- trajectory export to `.pt` files
 - trajectory visualization
 - API modifications
 - RL/IL experimental pipeline
 
-## Demo
-(Under construction...)
+
+## Benchmark (State Machine)
 
 
 
-# Origical ORBIT-Surgical README
+<img width="460.5" height="423.5" alt="success_benchmark" src="https://github.com/user-attachments/assets/f681bb24-c5ea-4648-a105-8a9747597f7e" />
 
 
-# ORBIT-Surgical
+The state machine baseline successfully grasps and lifts a suture needle.
+
+### Benchmark Video
+
+
+https://github.com/user-attachments/assets/07509bdc-0bed-4780-8f30-1dbccac22174
+
+
+
+## Current Extensions
+
+- Export trajectories to `.pt` files
+- Visualize end-effector and object trajectories
+- Record rewards, actions, and termination signals
+- Support future Behavior Cloning (BC) and Reinforcement Learning (RL) pipelines
+
+## Future Work
+
+- Collect successful Lift Needle demonstrations
+- Train BC policies from demonstrations
+- Train PPO policies or other RL policies
+- Compare state machine, BC, RL, and BC + RL performance
+
+
+
+
+# ORBIT-Surgical (Original ORBIT-Surgical README)
 
 [![IsaacSim](https://img.shields.io/badge/IsaacSim-4.1.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
 [![Isaac Lab](https://img.shields.io/badge/IsaacLab-1.0.0-silver)](https://isaac-sim.github.io/IsaacLab)
