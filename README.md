@@ -59,7 +59,7 @@ The demonstrations were collected using the state machine baseline and exported 
 
 ## Current Results
 
-The following results were evaluated on the Lift Needle task.
+The following results were evaluated on the Lift Needle task. Behavior Cloning policy learns Cartesian motion commands. Gripper actuation is currently controlled by a hand-crafted schedule.
 
 | Method | Demonstrations | Success Rate |
 |----------|----------|----------|
@@ -69,7 +69,8 @@ The following results were evaluated on the Lift Needle task.
 ## Future Work
 
 - Increase demonstration dataset size and diversity
-- Learn gripper timing and lifting behavior directly from demonstrations
+- Learn gripper control directly from demonstrations
+- Learn full 8-DoF actions including orientation and gripper commands
 - Train PPO pipelines from scratch
 - Fine-tune PPO from BC initialization (BC + PPO)
 - Compare state machine, BC, RL, and BC + RL performance
