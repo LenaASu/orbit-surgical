@@ -1,62 +1,19 @@
-<<<<<<< HEAD
-# Learning-Based Surgical Needle Manipulation in ORBIT-Surgical
-=======
 
-# ORBIT-Surgical Extensions for RL/IL on the Lift Needle Task
->>>>>>> 2b36b20 (Enhance README with Lift Needle task details)
+# Learning-Based Surgical Needle Manipulation in ORBIT-Surgical
 
 [![IsaacSim](https://img.shields.io/badge/IsaacSim-4.5.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
 [![Isaac Lab](https://img.shields.io/badge/IsaacLab-2.x-silver)](https://isaac-sim.github.io/IsaacLab)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-orange.svg)](https://releases.ubuntu.com/22.04/)
 
-<<<<<<< HEAD
 ## Overview
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 This project extends the ORBIT-Surgical framework with a complete robot learning pipeline for surgical needle manipulation.
 
 The implemented pipeline includes state-machine benchmarking, demonstration collection, imitation learning, reinforcement learning, hybrid BC+PPO training, and automatic policy evaluation on the Lift Needle task.
-=======
-This project investigates learning-based surgical manipulation in simulation using ORBIT-Surgical framework and Isaac Lab.
-<<<<<<< HEAD
->>>>>>> b9ed86d (Update README)
 
 ### Highlights
 
-- State machine surgical needle benchmark
-- Automatic demonstration collection
-- Trajectory collection, export and visualization
-- Behavior Cloning (BC) 
-- PPO
-- BC + PPO
-- Automatic policy checkpoint evaluation
-- Algorithm comparison
-
-## Setup
-
-<<<<<<< HEAD
-Once you are in the virtual environment, you do not need to use `${IsaacLab_PATH}/isaaclab.sh -p` to run python scripts. You can use the default python executable in your environment by running `python` or `python3`. However, for the rest of the documentation, we will assume that you are using `${IsaacLab_PATH}/isaaclab.sh -p` to run python scripts.
-
-<!-- Download and install the [Git Large File Storage (LFS)](https://git-lfs.com/). Once downloaded and installed, set up Git LFS for your user account by running:
-```bash
-git lfs install
-``` -->
-
-=======
-## Highlights
-=======
-It implements a complete robot learning pipeline for the Lift Needle benchmark, from demonstration collection to policy training and evaluation.
-=======
-This project extends the ORBIT-Surgical framework with a complete robot learning pipeline for surgical needle manipulation.
-
-The implemented pipeline includes state-machine benchmarking, demonstration collection, imitation learning, reinforcement learning, hybrid BC+PPO training, and automatic policy evaluation on the Lift Needle task.
->>>>>>> eb1c7de (Revise README)
-
-### Highlights
-
->>>>>>> 7c80788 (Revise README)
 - State machine surgical needle benchmark
 - Automatic demonstration collection
 - Trajectory collection, export and visualization
@@ -75,7 +32,6 @@ Once you are in the virtual environment, you do not need to use `${IsaacLab_PATH
 git lfs install
 ``` -->
 
->>>>>>> b9ed86d (Update README)
 Clone this repository to a directory **outside** the Isaac Lab installation directory:
 
 ```bash
@@ -84,32 +40,14 @@ git clone https://github.com/LenaASu/orbit-surgical.git
 
 ## Benchmark (State Machine)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 <p align="center">
   <img src="media/success_benchmark.png" width="300">
 </p>
-=======
-<img width="460.5" height="423.5" alt="success_benchmark" src="https://github.com/user-attachments/assets/f681bb24-c5ea-4648-a105-8a9747597f7e" />
->>>>>>> b9ed86d (Update README)
-=======
-<p align="center">
-  <img src="media/success_benchmark.png" width="300">
-</p>
->>>>>>> a81a1d6 (Update README)
 
 The state machine baseline successfully grasps and lifts a suture needle and is used to generate demonstration trajectories for imitation learning.
 
 ### Benchmark Video
-<<<<<<< HEAD
-
-<<<<<<< HEAD
-https://github.com/user-attachments/assets/ce90d0ef-4e73-4fb3-91ab-396f7ee821f4
-=======
-=======
->>>>>>> a81a1d6 (Update README)
 https://github.com/user-attachments/assets/07509bdc-0bed-4780-8f30-1dbccac22174
->>>>>>> b9ed86d (Update README)
 
 ## Dataset Statistics
 
@@ -132,157 +70,8 @@ Each trajectory stores:
 
 ## Imitation Learning
 ### Behavior Cloning (BC)
-<<<<<<< HEAD
-=======
 
 1. Collect demonstrations with state machine for the environment `Isaac-Lift-Needle-PSM-IK-Abs-v0`:
-
-```bash
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/state_machine/lift_needle_sm.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 1 
-```
-
-2. (Optional) Split the dataset into train and validation set: 
-
-```bash
-# split data
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/robomimic/tools/split_train_val.py logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/hdf_dataset.hdf5 --ratio 0.2
-```
-
-3. Train a BC agent for `Isaac-Lift-Needle-PSM-IK-Abs-v0`. `BCPOlicy` was inspired by [Minari](https://minari.farama.org/tutorials/using_datasets/behavioral_cloning/) and [Imitation](https://imitation.readthedocs.io/en/latest/algorithms/bc.html)
-
-```bash
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/bc_mse_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 
-```
-
-4. Play the learned model to visualize results:
-
-```bash
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/bc_mse_eval.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --checkpoint /PATH/TO/model.pth
-```
-
-## Reinforcement Learning
-### PPO
-
-Train an agent on `Isaac-Lift-Needle-PSM-IK-Abs-v0` with [RSL-RL](https://github.com/leggedrobotics/rsl_rl):
-
-```bash
-# run script for training
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/ppo_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --headless
-# run script for playing with 32 environments
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/ppo_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 32 
-```
-
-### BC + PPO
-
-Train an agent on `Isaac-Lift-Needle-PSM-IK-Abs-v0`:
-
-```bash
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/bc_rsl_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 1 
-```
-
-### (Optional) TensorBoard: TensorFlow's visualization toolkit 
-
-Monitor the training progress stored in the `logs` directory on [Tensorboard](https://www.tensorflow.org/tensorboard):
-
-```bash
-# execute from the root directory of the repository
-${IsaacLab_PATH}/isaaclab.sh -p -m tensorboard.main --logdir=logs
-```
-
-## Results
->>>>>>> b9ed86d (Update README)
-
-<<<<<<< HEAD
-1. Collect demonstrations with state machine for the environment `Isaac-Lift-Needle-PSM-IK-Abs-v0`:
-=======
-The following results were evaluated on the Lift Needle task. Behavior Cloning policy learns Cartesian motion commands. Gripper actuation is currently controlled by a hand-crafted schedule.
-PPO directly optimizes the manipulation policy through reinforcement learning.
-
-| Method | Demonstrations | Success Rate (50 Episodes) |
-|----------|----------|----------|
-| State Machine | N/A | 100% |
-| Behavior Cloning | 100 | 12% |
-| PPO | N/A | 20% |
-
-<<<<<<< HEAD
-## Future Work
-
-- Increase demonstration dataset size and diversity
-- Learn gripper control directly from demonstrations
-- Learn full 8-DoF actions including orientation and gripper commands
-- Improve PPO performance through reward and hyperparameter optimization
-- Fine-tune PPO from BC initialization (BC + PPO)
-- Compare state machine, BC, RL, and BC + RL performance
-- (Optional) Train other imitation learning policies like DAgger, GAIL, etc.
-
-
-
-
-=======
-This repository is forked from ORBIT-Surgical and extended with the following features for the Lift Needle task:
-- trajectory export to `.pt` files
-- trajectory visualization
-- API modifications
-- RL/IL experimental pipeline
-
-
-## Benchmark (State Machine)
-
-
-
-<img width="460.5" height="423.5" alt="success_benchmark" src="https://github.com/user-attachments/assets/f681bb24-c5ea-4648-a105-8a9747597f7e" />
-
-
-The state machine baseline successfully grasps and lifts a suture needle.
-
-### Benchmark Video
-
-
-https://github.com/user-attachments/assets/07509bdc-0bed-4780-8f30-1dbccac22174
-
-
-
-## Current Extensions
-
-- Export trajectories to `.pt` files
-- Visualize end-effector and object trajectories
-- Record rewards, actions, and termination signals
-- Support future Behavior Cloning (BC) and Reinforcement Learning (RL) pipelines
-
-## Future Work
-
-- Collect successful Lift Needle demonstrations
-- Train BC policies from demonstrations
-- Train PPO policies or other RL policies
-- Compare state machine, BC, RL, and BC + RL performance
-
-
-
-
->>>>>>> 2b36b20 (Enhance README with Lift Needle task details)
-# ORBIT-Surgical (Original ORBIT-Surgical README)
-
-[![IsaacSim](https://img.shields.io/badge/IsaacSim-4.1.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
-[![Isaac Lab](https://img.shields.io/badge/IsaacLab-1.0.0-silver)](https://isaac-sim.github.io/IsaacLab)
-[![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
-[![Linux platform](https://img.shields.io/badge/platform-linux--64-orange.svg)](https://releases.ubuntu.com/20.04/)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://pre-commit.com/)
-
-## Overview
-
-ORBIT-Surgical is a physics-based surgical robot simulation framework with photorealistic rendering in NVIDIA Omniverse. ORBIT-Surgical leverages GPU parallelization to train reinforcement learning and imitation learning algorithms to facilitate study of robot learning to augment human surgical skills. ORBIT-Surgical is built upon [NVIDIA Isaac Sim](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html) to leverage the latest simulation capabilities for photo-realistic scenes and fast and accurate simulation.
-
-
-## Setup
-
-### Basic Setup
-
-ORBIT-Surgical is built upon NVIDIA [Isaac Sim](https://docs.omniverse.nvidia.com/isaacsim/latest/index.html) and [Isaac Lab](https://github.com/isaac-sim/IsaacLab). For detailed instructions on how to install these dependencies, please refer to the [Isaac Lab installation guide](https://isaac-sim.github.io/IsaacLab/source/setup/installation/index.html).
-
-Please follow the Isaac Sim [documentation](https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_workstation.html) to install the latest Isaac Sim release.
-
-Clone [Isaac Lab repository](https://github.com/isaac-sim/IsaacLab):
->>>>>>> 1ae537e (Update README)
 
 ```bash
 ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/state_machine/lift_needle_sm.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 1 
@@ -345,10 +134,8 @@ PPO directly optimizes the manipulation policy through reinforcement learning.
 |----------|----------|----------|
 | State Machine | N/A | 100% |
 | Behavior Cloning | 100 | 12% |
-| PPO | N/A | 82% |
+| PPO | N/A | 20% |
 
-=======
->>>>>>> b9ed86d (Update README)
 ## Future Improvement
 
 - Improve current BC and PPO performance
