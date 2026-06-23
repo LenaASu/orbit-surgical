@@ -37,8 +37,12 @@ parser.add_argument(
 )
 parser.add_argument(
     "--checkpoint", type=str,
+<<<<<<< HEAD:source/standalone/environments/learning/bc_mse_eval.py
     # default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
     default= "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_00.pt",
+=======
+    default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
+>>>>>>> 2372a4d (Succeed in lifting with bc policy):source/standalone/environments/imitation_learning/eval_bc.py
     help="Pytorch model checkpoint to load."
 )
 
@@ -180,6 +184,7 @@ def main():
         # run everything in inference mode
         with torch.inference_mode():
             # compute actions
+<<<<<<< HEAD:source/standalone/environments/learning/bc_mse_eval.py
             actions = policy(obs)
 
             # only xyz
@@ -197,6 +202,14 @@ def main():
                 # print("actions shape:", actions.shape)
                 continue
 
+=======
+            xyz = policy(obs)
+            xyz = torch.clamp(xyz, -1.0, 1.0)
+            actions = torch.zeros((obs.shape[0], 8), device=obs.device)
+            actions[:, :3] = xyz
+            actions[:, 3] = 1.0
+            actions[:,4:7] = 0.0
+>>>>>>> 2372a4d (Succeed in lifting with bc policy):source/standalone/environments/imitation_learning/eval_bc.py
             if episode_step < 180:
                 actions[:, 7] = 1.0
             elif episode_step < 300:
