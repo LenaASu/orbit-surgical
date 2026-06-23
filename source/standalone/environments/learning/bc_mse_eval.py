@@ -37,6 +37,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--checkpoint", type=str,
+<<<<<<< HEAD:source/standalone/environments/learning/bc_mse_eval.py
 <<<<<<< HEAD
 =======
 <<<<<<<< HEAD:source/standalone/environments/learning/bc_eval.py
@@ -54,6 +55,9 @@ parser.add_argument(
     default= "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_00.pt",
 >>>>>>>> 16fef0a (Test bc+ppo):source/standalone/environments/learning/bc_mse_eval.py
 >>>>>>> 16fef0a (Test bc+ppo)
+=======
+    default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
+>>>>>>> 2372a4d (Succeed in lifting with bc policy):source/standalone/environments/imitation_learning/eval_bc.py
     help="Pytorch model checkpoint to load."
 )
 
@@ -231,12 +235,15 @@ def main():
             actions[:, :3] = xyz
             actions[:, 3] = 1.0
             actions[:,4:7] = 0.0
+<<<<<<< HEAD:source/standalone/environments/learning/bc_mse_eval.py
 >>>>>>> 2372a4d (Succeed in lifting with bc policy):source/standalone/environments/imitation_learning/eval_bc.py
 <<<<<<< HEAD
 =======
 ========
 >>>>>>>> 16fef0a (Test bc+ppo):source/standalone/environments/learning/bc_mse_eval.py
 >>>>>>> 16fef0a (Test bc+ppo)
+=======
+>>>>>>> 2372a4d (Succeed in lifting with bc policy):source/standalone/environments/imitation_learning/eval_bc.py
             if episode_step < 180:
                 actions[:, 7] = 1.0
             elif episode_step < 300:
