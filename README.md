@@ -1,47 +1,79 @@
 
-# ORBIT-Surgical Extensions for RL/IL on the Lift Needle Task
+# Learning-Based Surgical Needle Manipulation in ORBIT-Surgical
 
 [![IsaacSim](https://img.shields.io/badge/IsaacSim-4.5.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
 [![Isaac Lab](https://img.shields.io/badge/IsaacLab-2.x-silver)](https://isaac-sim.github.io/IsaacLab)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-orange.svg)](https://releases.ubuntu.com/22.04/)
 
-This repository is forked from ORBIT-Surgical and extended with the following features for the Lift Needle task:
-- trajectory export to `.pt` files
-- trajectory visualization
-- API modifications
-- RL/IL experimental pipeline
+## Project Goal
+
+This project investigates learning-based surgical manipulation in simulation using ORBIT-Surgical and Isaac Lab.
+
+The goal is to compare:
+
+- Hand-crafted State Machine policies
+- Imitation Learning (Behavior Cloning)
+- Reinforcement Learning (PPO)
+- Hybrid BC + PPO methods
+
+on the Lift Needle benchmark task.
+
+
 
 
 ## Benchmark (State Machine)
 
 
-
 <img width="460.5" height="423.5" alt="success_benchmark" src="https://github.com/user-attachments/assets/f681bb24-c5ea-4648-a105-8a9747597f7e" />
 
 
-The state machine baseline successfully grasps and lifts a suture needle.
+The state machine baseline successfully grasps and lifts a suture needle and is used to generate demonstration trajectories for imitation learning.
+
 
 ### Benchmark Video
 
 
 https://github.com/user-attachments/assets/07509bdc-0bed-4780-8f30-1dbccac22174
 
+## Implemented Features
+- Export successful trajectories to `.pt` files
+- Trajectory visualization
+- Benchmark evaluation and success-rate analysis
+- Behavior Cloning (BC) training pipeline
+- BC policy evaluation
+- Episode logging (reward, action, success, timeout)
 
 
-## Current Extensions
 
-- Export trajectories to `.pt` files
-- Visualize end-effector and object trajectories
-- Record rewards, actions, and termination signals
-- Support future Behavior Cloning (BC) and Reinforcement Learning (RL) pipelines
+
+## Dataset Statistics
+
+- Successful demonstrations: 100
+- Observation dimension: 34
+- Action dimension: 8
+- Mean trajectory length: 196.62 steps
+- Environment: Isaac-Lift-Needle-PSM-IK-Abs
+  
+The demonstrations were collected using the state machine baseline and exported as trajectory datasets for imitation learning.
+
+## Current Results
+
+The following results were evaluated on the Lift Needle task.
+
+| Method | Demonstrations | Success Rate |
+|----------|----------|----------|
+| State Machine | N/A | 100% |
+| Behavior Cloning | 100 | 12% |
 
 ## Future Work
 
-- Collect successful Lift Needle demonstrations
-- Train BC policies from demonstrations
-- Train PPO policies or other RL policies
+- Increase demonstration dataset size and diversity
+- Learn gripper timing and lifting behavior directly from demonstrations
+- Train PPO pipelines from scratch
+- Fine-tune PPO from BC initialization (BC + PPO)
 - Compare state machine, BC, RL, and BC + RL performance
+- (Optional) Train other imitation learning policies like DAgger, GAIL, etc.
 
 
 
