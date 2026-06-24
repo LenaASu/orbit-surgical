@@ -22,7 +22,12 @@ def object_is_lifted(
 ) -> torch.Tensor:
     """Reward the agent for lifting the object above the minimal height."""
     object: RigidObject = env.scene[object_cfg.name]
-    return torch.where(object.data.root_pos_w[:, 2] > minimal_height, 1.0, 0.0)
+
+    initial_z = object.data.default_root_state[:, 2]
+    current_z = object.data.root_pos_w[:, 2]
+    
+    # return torch.where(object.data.root_pos_w[:, 2] > minimal_height, 1.0, 0.0)
+    return torch.where((current_z - initial_z) > minimal_height, 1.0, 0.0)
 
 
 def object_ee_distance(
@@ -58,10 +63,15 @@ def object_goal_distance(
     robot: RigidObject = env.scene[robot_cfg.name]
     object: RigidObject = env.scene[object_cfg.name]
     command = env.command_manager.get_command(command_name)
+
+    initial_z = object.data.default_root_state[:, 2]
+    current_z = object.data.root_pos_w[:, 2]
+
     # compute the desired position in the world frame
     des_pos_b = command[:, :3]
     des_pos_w, _ = combine_frame_transforms(robot.data.root_state_w[:, :3], robot.data.root_state_w[:, 3:7], des_pos_b)
     # distance of the end-effector to the object: (num_envs,)
     distance = torch.norm(des_pos_w - object.data.root_pos_w[:, :3], dim=1)
     # rewarded if the object is lifted above the threshold
-    return (object.data.root_pos_w[:, 2] > minimal_height) * (1 - torch.tanh(distance / std))
+    # return (object.data.root_pos_w[:, 2] > minimal_height) * (1 - torch.tanh(distance / std))
+    return ((current_z - initial_z) > minimal_height) * (1 - torch.tanh(distance / std))

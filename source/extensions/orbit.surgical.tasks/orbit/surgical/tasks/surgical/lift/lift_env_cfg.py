@@ -73,26 +73,6 @@ class ObjectTableSceneCfg(InteractiveSceneCfg):
         spawn=sim_utils.DomeLightCfg(color=(0.75, 0.75, 0.75), intensity=3000.0),
     )
 
-    # # sensors
-    # camera = CameraCfg(
-    #     prim_path="{ENV_REGEX_NS}/Camera",
-    #     update_period=0.1,
-    #     height=64,
-    #     width=64,
-    #     data_types=["rgb"],
-    #     spawn=sim_utils.PinholeCameraCfg(
-    #         focal_length=24.0,
-    #         focus_distance=400.0,
-    #         horizontal_aperture=20.955,
-    #         clipping_range=(0.1, 1.0e5),
-    #     ),
-    #     offset=CameraCfg.OffsetCfg(
-    #         pos=(0.25, 0.0, 0.25),
-    #         rot=(0.707, 0.0, 0.707, 0.0),
-    #         convention="ros",
-    #     ),
-    # )
-
 
 ##
 # MDP settings
@@ -187,26 +167,26 @@ class RewardsCfg:
 
     reaching_object = RewTerm(func=mdp.object_ee_distance, params={"std": 0.1}, weight=1.0)
 
-    lifting_object = RewTerm(func=mdp.object_is_lifted, params={"minimal_height": 0.02}, weight=15.0)
+    lifting_object = RewTerm(func=mdp.object_is_lifted, params={"minimal_height": 0.02}, weight=30.0) # 15
 
     object_goal_tracking = RewTerm(
         func=mdp.object_goal_distance,
         params={"std": 0.3, "minimal_height": 0.02, "command_name": "object_pose"},
-        weight=16.0,
+        weight=30.0, # 16
     )
 
     object_goal_tracking_fine_grained = RewTerm(
         func=mdp.object_goal_distance,
         params={"std": 0.05, "minimal_height": 0.02, "command_name": "object_pose"},
-        weight=5.0,
+        weight=10.0, # 5
     )
 
     # action penalty
-    action_rate = RewTerm(func=mdp.action_rate_l2, weight=-1e-3)
+    action_rate = RewTerm(func=mdp.action_rate_l2, weight=-1e-4) #-1e-3
 
     joint_vel = RewTerm(
         func=mdp.joint_vel_l2,
-        weight=-1e-4,
+        weight=-1e-5, #-1e-4
         params={"asset_cfg": SceneEntityCfg("robot")},
     )
 
@@ -231,13 +211,15 @@ class TerminationsCfg:
 class CurriculumCfg:
     """Curriculum terms for the MDP."""
 
-    action_rate = CurrTerm(
-        func=mdp.modify_reward_weight, params={"term_name": "action_rate", "weight": -1e-1, "num_steps": 10000}
-    )
+    # action_rate = CurrTerm(
+    #     func=mdp.modify_reward_weight, params={"term_name": "action_rate", "weight": -1e-1, "num_steps": 10000}
+    # )
 
-    joint_vel = CurrTerm(
-        func=mdp.modify_reward_weight, params={"term_name": "joint_vel", "weight": -1e-1, "num_steps": 10000}
-    )
+    # joint_vel = CurrTerm(
+    #     func=mdp.modify_reward_weight, params={"term_name": "joint_vel", "weight": -1e-1, "num_steps": 10000}
+    # )
+
+    pass
 
 
 ##
