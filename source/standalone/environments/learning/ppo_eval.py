@@ -1,5 +1,9 @@
 """
+<<<<<<< HEAD
 Script to run PPO policies to pick and lift the suture needle and save the policies with top 5 highest success rate.
+=======
+Script to run a trained Behavior Cloning policy to pick and lift the suture needle.
+>>>>>>> 67fca5d (Rename)
 
 
 .. code-block:: bash
@@ -14,7 +18,10 @@ Script to run PPO policies to pick and lift the suture needle and save the polic
 
 import argparse
 from pathlib import Path
+<<<<<<< HEAD
 import pandas as pd
+=======
+>>>>>>> 67fca5d (Rename)
 from isaaclab.app import AppLauncher
 # local imports
 import cli_args  # isort: skip
@@ -32,6 +39,7 @@ parser.add_argument(
     default="Isaac-Lift-Needle-PSM-IK-Abs-Play-v0", 
     help="Name of the task."
 )
+<<<<<<< HEAD
 parser.add_argument(
     "--checkpoint_dir",
     type=str,
@@ -41,6 +49,14 @@ parser.add_argument(
 
 FILE_PATH = Path(__file__).resolve().parent
 save_path = FILE_PATH / "results" / "bc_ppo_top5.csv"
+=======
+# parser.add_argument(
+#     "--checkpoint", type=str,
+#     # default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
+#     default="/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/2026-06-24_22-16-35/model_950.pt",
+#     help="Pytorch model checkpoint to load."
+# )
+>>>>>>> 67fca5d (Rename)
 
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
@@ -49,9 +65,13 @@ AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 
 if args_cli.checkpoint is None:
+<<<<<<< HEAD
     # args_cli.checkpoint = "/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
     args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_00.pt"
     # args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
+=======
+    args_cli.checkpoint = "/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/2026-06-24_22-16-35/model_950.pt"
+>>>>>>> 67fca5d (Rename)
 
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
@@ -76,16 +96,64 @@ from isaaclab_rl.rsl_rl import (
 
 import orbit.surgical.tasks  # noqa: F401
 
+<<<<<<< HEAD
 def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
     """Play with RSL-RL agent and print results summary."""
     # load previously trained model
     ppo_runner = OnPolicyRunner(env, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device)
     ppo_runner.load(str(checkpoint_path))
     print(f"[INFO]: Loading model checkpoint from: {checkpoint_path}")
+=======
+
+
+def main():
+    """Play with RSL-RL agent and print results summary."""
+    # LOG_DIR = Path("/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift")
+    # checkpoint_dir = LOG_DIR / "2026-06-24_22-16-35"
+
+    # parse configuration
+    env_cfg = parse_env_cfg(args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs, use_fabric=not args_cli.disable_fabric)
+    agent_cfg: RslRlOnPolicyRunnerCfg = cli_args.parse_rsl_rl_cfg(args_cli.task, args_cli)
+
+    # create environment
+    env = gym.make(args_cli.task, cfg=env_cfg)
+    # wrap around environment for rsl-rl
+    env = RslRlVecEnvWrapper(env)
+
+    # load data
+    # checkpoint_files = sorted(checkpoint_dir.glob("*.pt"))
+    # for checkpoint_file in checkpoint_files:
+    #     checkpoint = torch.load(checkpoint_file, map_location=args_cli.device, weights_only=True)
+
+    # checkpoint = torch.load(checkpoint, map_location=args_cli.device, weights_only=True)
+    # specify directory for logging experiments
+    log_root_path = os.path.join("logs", "rsl_rl", agent_cfg.experiment_name)
+    log_root_path = os.path.abspath(log_root_path)
+    print(f"[INFO] Loading experiment from directory: {log_root_path}")
+    # resume_path = get_checkpoint_path(log_root_path, agent_cfg.load_run, agent_cfg.load_checkpoint)
+    resume_path = args_cli.checkpoint
+    print(f"[INFO]: Loading model checkpoint from: {resume_path}")
+
+    # load previously trained model
+    ppo_runner = OnPolicyRunner(env, agent_cfg.to_dict(), log_dir="2026-06-24_22-16-35", device=agent_cfg.device)
+    ppo_runner.load(resume_path)
+    print(f"[INFO]: Loading model checkpoint from: {resume_path}")
+>>>>>>> 67fca5d (Rename)
 
     # obtain the trained policy for inference
     policy = ppo_runner.get_inference_policy(device=env.unwrapped.device)
 
+<<<<<<< HEAD
+=======
+    # export policy to onnx
+    export_model_dir = os.path.join(os.path.dirname(resume_path), "exported")
+    export_policy_as_jit(
+        ppo_runner.alg.policy, ppo_runner.obs_normalizer, path=export_model_dir, filename="policy.pt"
+    )
+    export_policy_as_onnx(ppo_runner.alg.policy, path=export_model_dir, filename="policy.onnx")
+
+
+>>>>>>> 67fca5d (Rename)
     # reset environment
     obs, info = env.reset()
     
@@ -93,6 +161,7 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
     episode_step = 0
     
     step_cnt = 0
+<<<<<<< HEAD
     success_log = 0
     timeout_log = 0
     drop_log = 0
@@ -102,18 +171,31 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
 
     num_episodes = 50 # set number of episodes
   
+=======
+    success_cnt = 0
+    timeout_cnt = 0
+    num_episodes = 50 # set number of episodes
+    success_cnt = 0
+>>>>>>> 67fca5d (Rename)
     success_steps = []
     episode_reward = 0.0
     total_rewards = []
     episode_lengths = []
 
+<<<<<<< HEAD
 
     while simulation_app.is_running() and episode_id <= num_episodes:
         
+=======
+     
+
+    while simulation_app.is_running() and episode_id < num_episodes:
+>>>>>>> 67fca5d (Rename)
         # run everything in inference mode
         with torch.inference_mode():
             # compute actions
             actions = policy(obs)
+<<<<<<< HEAD
         obs, rewards, dones, info = env.step(actions)
 
         # episode_reward += rewards.mean().item()
@@ -134,6 +216,33 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
 
             if drop_log == 1:
                 drop_cnt += 1
+=======
+           
+            obs, rewards, dones, info = env.step(actions)
+            # only cares about policy observations
+            # obs = obs_dict["policy"].to(args_cli.device)
+
+            # ee_pos = env.unwrapped.scene["robot"].data.body_pos_w[:, ee_body_id]
+            # object_pos = env.unwrapped.scene["object"].data.root_pos_w
+    
+
+            # episode_reward += rewards.mean().item()
+            # episode_step += 1
+
+            success_log = info["log"]["Episode_Termination/object_lifted"]
+            timeout_log = info["log"]["Episode_Termination/time_out"]
+
+            if success_log > 0 and dones.any():
+                success_cnt += 1
+                print(f"Episode {episode_id}: Success")
+                # print(info)
+            #     success_steps.append(episode_step)
+            #     episode_lengths.append(episode_step)
+            
+            if timeout_log > 0 and dones.any():
+                timeout_cnt += 1
+                print(f"Episode {episode_id}: Timeout")
+>>>>>>> 67fca5d (Rename)
 
             # # print("obs", obs.shape, obs[0, :10])
             # # print("actions", actions.shape, actions[0])
@@ -152,6 +261,7 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
             #     # "action[0,0:3]:", actions[0,0:3],
             # )
 
+<<<<<<< HEAD
 
             # if episode_id >= num_episodes:
             #     break
@@ -241,6 +351,42 @@ def main():
     df = pd.DataFrame(results[:5])
     df.to_csv(save_path, index=False)
 
+=======
+            if dones.any():
+                # if episode_id >= num_episodes:
+                #     break
+                
+                episode_id += 1
+                # total_rewards.append(episode_reward)
+                # episode_lengths.append(episode_step)
+                
+                # # reset
+                # episode_reward = 0.0
+                # episode_step = 0
+                # print(info)
+                # print("success:", success_cnt)
+                # print("timeout: ", timeout_cnt)
+                obs, info = env.reset()
+                # obs = obs_dict["policy"].to(args_cli.device)
+
+    print("-" * 50)
+    print(f"{'Metric':<25} | {'Value':<15}")
+    print("-" * 50)
+    print(f"{'Task':<25} | {args_cli.task:<15}")
+    print(f"{'Checkpoint':<25} | {Path(checkpoint).name:<15}")
+    print(f"{'Episodes':<25} | {episode_id:<15}")
+    print(f"{'Success Episodes':<25} | {success_cnt:<15}")
+    print(f"{'Success Rate':<25} | {success_cnt / episode_id * 100:.1f}%")
+    print(f"{'Timeout Episodes':<25} | {timeout_cnt:<15}")
+    print(f"{'Timeout Rate':<25} | {timeout_cnt / episode_id * 100:.1f}%")
+    print(f"{'Mean Reward':<25} | {sum(total_rewards) / len(total_rewards):.3f}")
+    print(f"{'Mean Episode Length':<25} | {sum(episode_lengths) / len(episode_lengths):.1f}")
+    if success_steps:
+        print(f"{'Mean Success Step':<25} | {sum(success_steps) / len(success_steps):.1f}")
+    else:
+        print(f"{'Mean Success Step':<25} | N/A")
+    print("-" * 50)
+>>>>>>> 67fca5d (Rename)
     # close the simulator
     env.close()
 
