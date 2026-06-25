@@ -35,12 +35,15 @@ parser.add_argument(
 parser.add_argument(
     "--checkpoint_dir",
     type=str,
-    # default="/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test",
-    default="/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-07-05_23-40-21",
+    default="/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test",
 )
-
-FILE_PATH = Path(__file__).resolve().parent
-save_path = FILE_PATH / "results" / "bc_ppo_top5_v3.csv"
+# parser.add_argument("--num_eval_episodes", type=int, default=50)
+# parser.add_argument(
+#     "--checkpoint", type=str,
+#     # default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
+#     default="/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/2026-06-24_22-16-35/model_950.pt",
+#     help="Pytorch model checkpoint to load."
+# )
 
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
@@ -221,8 +224,6 @@ def main():
         print(f"drop {result['drop']}")
     
     results = sorted(results, key=lambda x:x["success_rate"], reverse=True)
-
-
 
     print("\n" + "=" * 70)
     print("Top 5 PPO Checkpoints")
