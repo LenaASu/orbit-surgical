@@ -6,6 +6,7 @@
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-orange.svg)](https://releases.ubuntu.com/22.04/)
 
+
 ## Project Goal
 
 This project investigates learning-based surgical manipulation in simulation using ORBIT-Surgical and Isaac Lab.
@@ -40,8 +41,8 @@ https://github.com/user-attachments/assets/07509bdc-0bed-4780-8f30-1dbccac22174
 - Export successful trajectories to `.pt` files
 - Trajectory visualization
 - Benchmark evaluation and success-rate analysis
-- Behavior Cloning (BC) training pipeline
-- BC policy evaluation
+- Behavior Cloning (BC) training and evaluation
+- PPO training and evaluation
 - Episode logging (reward, action, success, timeout)
 
 
@@ -54,24 +55,36 @@ https://github.com/user-attachments/assets/07509bdc-0bed-4780-8f30-1dbccac22174
 - Action dimension: 8
 - Mean trajectory length: 196.62 steps
 - Environment: Isaac-Lift-Needle-PSM-IK-Abs
+
+Each trajectory contains:
+
+- observations
+- actions
+- rewards
+- success labels
+- episode information
+- end-effector pose
+- object pose
   
 The demonstrations were collected using the state machine baseline and exported as trajectory datasets for imitation learning.
 
 ## Current Results
 
 The following results were evaluated on the Lift Needle task. Behavior Cloning policy learns Cartesian motion commands. Gripper actuation is currently controlled by a hand-crafted schedule.
+PPO directly optimizes the manipulation policy through reinforcement learning.
 
-| Method | Demonstrations | Success Rate |
+| Method | Demonstrations | Success Rate (50 Episodes) |
 |----------|----------|----------|
 | State Machine | N/A | 100% |
 | Behavior Cloning | 100 | 12% |
+| PPO | N/A | 18% |
 
 ## Future Work
 
 - Increase demonstration dataset size and diversity
 - Learn gripper control directly from demonstrations
 - Learn full 8-DoF actions including orientation and gripper commands
-- Train PPO pipelines from scratch
+- Improve PPO performance through reward and hyperparameter optimization
 - Fine-tune PPO from BC initialization (BC + PPO)
 - Compare state machine, BC, RL, and BC + RL performance
 - (Optional) Train other imitation learning policies like DAgger, GAIL, etc.
