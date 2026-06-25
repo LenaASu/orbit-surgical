@@ -9,9 +9,9 @@ Script to run a trained Behavior Cloning policy to pick and lift the suture need
 
 .. code-block:: bash
 
-    ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/imitation_learning/eval_bc.py
+    ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/imitation_learning/bc_eval.py
 
-    ~/IsaacLab/isaaclab.sh -p source/standalone/environments/imitation_learning/eval_bc.py 
+    ~/IsaacLab/isaaclab.sh -p source/standalone/environments/imitation_learning/bc_eval.py 
   
 """
 
