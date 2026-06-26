@@ -14,6 +14,7 @@ Script to run a trained Behavior Cloning policy to pick and lift the suture need
 
 import argparse
 from pathlib import Path
+import pandas as pd
 from isaaclab.app import AppLauncher
 # local imports
 import cli_args  # isort: skip
@@ -34,7 +35,7 @@ parser.add_argument(
 parser.add_argument(
     "--checkpoint_dir",
     type=str,
-    default="/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test",
+    default="/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/2026-06-24_19-29-25",
 )
 # parser.add_argument("--num_eval_episodes", type=int, default=50)
 # parser.add_argument(
@@ -51,7 +52,7 @@ AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 
 if args_cli.checkpoint is None:
-    args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-06-24_22-16-35/model_999.pt"
+    args_cli.checkpoint = "/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
 
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
@@ -270,6 +271,8 @@ def main():
     
     results = sorted(results, key=lambda x:x["success_rate"], reverse=True)
 
+
+
     print("\n" + "=" * 70)
     print("Top 5 PPO Checkpoints")
     print("=" * 70)
@@ -279,9 +282,13 @@ def main():
             f"success_rate={r['success_rate']:.1f}% "
             f"success={r['success']}/{r['episodes']} "
             f"timeout={r['timeout']} "
-        
+            f"drop={r['drop']}"
         )
     print("=" * 70)
+    rows = []
+
+    df = pd.DataFrame(results[:5])
+    df.to_csv("ppo_top5.csv", index=False)
 
     # close the simulator
     env.close()
