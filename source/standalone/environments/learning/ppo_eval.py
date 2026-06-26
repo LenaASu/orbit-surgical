@@ -35,7 +35,7 @@ parser.add_argument(
 parser.add_argument(
     "--checkpoint_dir",
     type=str,
-    default="/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test",
+    default="/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/2026-06-24_19-29-25",
 )
 # parser.add_argument("--num_eval_episodes", type=int, default=50)
 # parser.add_argument(
@@ -224,6 +224,8 @@ def main():
         print(f"drop {result['drop']}")
     
     results = sorted(results, key=lambda x:x["success_rate"], reverse=True)
+
+
 
     print("\n" + "=" * 70)
     print("Top 5 PPO Checkpoints")
