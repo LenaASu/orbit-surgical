@@ -1,5 +1,5 @@
 """
-Script to run a trained Behavior Cloning policy to pick and lift the suture needle.
+Script to run PPO policies to pick and lift the suture needle and save the policies with top 5 highest success rate.
 
 
 .. code-block:: bash
@@ -35,15 +35,12 @@ parser.add_argument(
 parser.add_argument(
     "--checkpoint_dir",
     type=str,
-    default="/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/2026-06-24_19-29-25",
+    # default="/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test",
+    default="/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/",
 )
-# parser.add_argument("--num_eval_episodes", type=int, default=50)
-# parser.add_argument(
-#     "--checkpoint", type=str,
-#     # default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
-#     default="/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/2026-06-24_22-16-35/model_950.pt",
-#     help="Pytorch model checkpoint to load."
-# )
+
+FILE_PATH = Path(__file__).resolve().parent
+save_path = FILE_PATH / "results" / "bc_ppo_top5.csv"
 
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
@@ -52,7 +49,9 @@ AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 
 if args_cli.checkpoint is None:
-    args_cli.checkpoint = "/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
+    # args_cli.checkpoint = "/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
+    args_cli.chekpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_00.pt"
+    # args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
 
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
@@ -77,36 +76,8 @@ from isaaclab_rl.rsl_rl import (
 
 import orbit.surgical.tasks  # noqa: F401
 
-
-
 def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
     """Play with RSL-RL agent and print results summary."""
-    # LOG_DIR = Path("/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift")
-    # checkpoint_dir = LOG_DIR / "2026-06-24_22-16-35"
-
-    # parse configuration
-    # env_cfg = parse_env_cfg(args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs, use_fabric=not args_cli.disable_fabric)
-    # agent_cfg: RslRlOnPolicyRunnerCfg = cli_args.parse_rsl_rl_cfg(args_cli.task, args_cli)
-
-    # # create environment
-    # env = gym.make(args_cli.task, cfg=env_cfg)
-    # # wrap around environment for rsl-rl
-    # env = RslRlVecEnvWrapper(env)
-
-    # # load data
-    # # checkpoint_files = sorted(checkpoint_dir.glob("*.pt"))
-    # # for checkpoint_file in checkpoint_files:
-    # #     checkpoint = torch.load(checkpoint_file, map_location=args_cli.device, weights_only=True)
-
-    # # checkpoint = torch.load(checkpoint, map_location=args_cli.device, weights_only=True)
-    # # specify directory for logging experiments
-    # log_root_path = os.path.join("logs", "rsl_rl", agent_cfg.experiment_name)
-    # log_root_path = os.path.abspath(log_root_path)
-    # print(f"[INFO] Loading experiment from directory: {log_root_path}")
-    # # resume_path = get_checkpoint_path(log_root_path, agent_cfg.load_run, agent_cfg.load_checkpoint)
-    # resume_path = args_cli.checkpoint
-    # print(f"[INFO]: Loading model checkpoint from: {resume_path}")
-
     # load previously trained model
     ppo_runner = OnPolicyRunner(env, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device)
     ppo_runner.load(str(checkpoint_path))
@@ -114,14 +85,6 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
 
     # obtain the trained policy for inference
     policy = ppo_runner.get_inference_policy(device=env.unwrapped.device)
-
-    # export policy to onnx
-    # export_model_dir = os.path.join(os.path.dirname(resume_path), "exported")
-    # export_policy_as_jit(
-    #     ppo_runner.alg.policy, ppo_runner.obs_normalizer, path=export_model_dir, filename="policy.pt"
-    # )
-    # export_policy_as_onnx(ppo_runner.alg.policy, path=export_model_dir, filename="policy.onnx")
-
 
     # reset environment
     obs, info = env.reset()
@@ -144,7 +107,6 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
     total_rewards = []
     episode_lengths = []
 
-     
 
     while simulation_app.is_running() and episode_id <= num_episodes:
         
@@ -153,13 +115,6 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
             # compute actions
             actions = policy(obs)
         obs, rewards, dones, info = env.step(actions)
-        
-        # only cares about policy observations
-        # obs = obs_dict["policy"].to(args_cli.device)
-
-        # ee_pos = env.unwrapped.scene["robot"].data.body_pos_w[:, ee_body_id]
-        # object_pos = env.unwrapped.scene["object"].data.root_pos_w
-
 
         # episode_reward += rewards.mean().item()
         episode_step += 1
@@ -174,10 +129,6 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
             if success_log == 1:
                 success_cnt += 1
                 
-                # print(info)
-            #     success_steps.append(episode_step)
-            #     episode_lengths.append(episode_step)
-            
             if timeout_log == 1:
                 timeout_cnt += 1
 
@@ -255,7 +206,7 @@ def main():
     env = RslRlVecEnvWrapper(env)
 
     checkpoint_files = sorted(checkpoint_dir.glob("model_*.pt"), key=lambda p: int(p.stem.split("_")[1]),)
-    checkpoint_files = [p for p in checkpoint_files if int(p.stem.split("_")[1]) >= 900]
+    checkpoint_files = [p for p in checkpoint_files if int(p.stem.split("_")[1]) >= 200]
     results = []
 
     for checkpoint_path in checkpoint_files:
@@ -288,7 +239,7 @@ def main():
     rows = []
 
     df = pd.DataFrame(results[:5])
-    df.to_csv("ppo_top5.csv", index=False)
+    df.to_csv(save_path, index=False)
 
     # close the simulator
     env.close()

@@ -37,7 +37,8 @@ parser.add_argument(
 )
 parser.add_argument(
     "--checkpoint", type=str,
-    default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
+    # default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
+    default= "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_00.pt",
     help="Pytorch model checkpoint to load."
 )
 
@@ -58,7 +59,7 @@ import torch
 from stable_baselines3.common.policies import ActorCriticPolicy
 from isaaclab_tasks.utils import parse_env_cfg
 import orbit.surgical.tasks  # noqa: F401
-from train_bc_mse import BCPolicy
+from bc_rsl_train import BCPolicy
 
 
 def main():
@@ -86,7 +87,11 @@ def main():
     # restore policy
     # policy = ActorCriticPolicy.load(checkpoint, device=args_cli.device)
     policy = BCPolicy(obs_dim=checkpoint["obs_dim"], act_dim=checkpoint["act_dim"]).to(args_cli.device)
-    policy.load_state_dict(checkpoint["model_state_dict"])
+    state_dict = checkpoint["model_state_dict"]
+    if "0.weight" in state_dict:
+        policy.net.load_state_dict(state_dict)
+    else:
+        policy.load_state_dict(state_dict)
     policy.eval()
 
     # print("=" * 50)
@@ -175,12 +180,23 @@ def main():
         # run everything in inference mode
         with torch.inference_mode():
             # compute actions
-            xyz = policy(obs)
-            xyz = torch.clamp(xyz, -1.0, 1.0)
-            actions = torch.zeros((obs.shape[0], 8), device=obs.device)
-            actions[:, :3] = xyz
-            actions[:, 3] = 1.0
-            actions[:,4:7] = 0.0
+            actions = policy(obs)
+
+            # only xyz
+            if actions.shape == (1,3):
+                xyz = actions
+                xyz = torch.clamp(xyz, -1.0, 1.0)
+                actions = torch.zeros((obs.shape[0], 8), device=obs.device)
+                actions[:, :3] = xyz
+                actions[:, 3] = 1.0
+                actions[:,4:7] = 0.0
+            
+            # full 8 DOF
+            elif actions.shape == (1,8):
+                # print("actions:", actions)
+                # print("actions shape:", actions.shape)
+                continue
+
             if episode_step < 180:
                 actions[:, 7] = 1.0
             elif episode_step < 300:

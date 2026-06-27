@@ -18,7 +18,7 @@ parser.add_argument(
 parser.add_argument(
     "--task", 
     type=str, 
-    default="Isaac-Lift-Needle-PSM-IK-Abs-Play-v0", 
+    default="Isaac-Lift-Needle-PSM-IK-Abs-v0", 
     help="Name of the task."
 )
 
@@ -36,8 +36,8 @@ parser.add_argument(
 
 
 IL_DIR = Path(__file__).resolve().parent
-traj_dir = IL_DIR / "data" / "lift_n_trajs_1"
-save_path = IL_DIR / "policies" / "bc_lift_n_1_policy_500.zip"
+traj_dir = IL_DIR / "data" / "lift_n_trajs_100_v2"
+save_path = IL_DIR / "policies" / "bc_lift_n_100_policy_2.zip"
 
 # load trajs
 traj_files = sorted(
@@ -123,8 +123,9 @@ bc_trainer = bc.BC(
     rng=rng,
     batch_size=32,
 )
-bc_trainer.train(n_epochs=500)
+bc_trainer.train(n_epochs=2)
 bc_trainer.policy.save(str(save_path))
+print(bc_trainer.policy)
 print(f"Saved BC policy to {save_path}.")
 # reward, _ = evaluate_policy(bc_trainer.policy, env, 10)
 # print("Reward: ", reward)

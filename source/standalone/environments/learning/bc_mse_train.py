@@ -22,7 +22,7 @@ class BCPolicy(nn.Module):
         return self.net(obs)
 
 def train():
-    parser = argparse.ArgumentParser(description="Train BC policy using imitation for Isaac Lab environments.")
+    parser = argparse.ArgumentParser(description="Train BC policy for Isaac Lab environments.")
     parser.add_argument(
         "--num_envs", type=int, default=1, help="Number of environments to simulate."
     )
