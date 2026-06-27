@@ -77,7 +77,7 @@ PPO directly optimizes the manipulation policy through reinforcement learning.
 |----------|----------|----------|
 | State Machine | N/A | 100% |
 | Behavior Cloning | 100 | 12% |
-| PPO | N/A | 18% |
+| PPO | N/A | 20% |
 
 ## Future Work
 
