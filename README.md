@@ -8,6 +8,7 @@
 ## Overview
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 This project extends the ORBIT-Surgical framework with a complete robot learning pipeline for surgical needle manipulation.
 
 The implemented pipeline includes state-machine benchmarking, demonstration collection, imitation learning, reinforcement learning, hybrid BC+PPO training, and automatic policy evaluation on the Lift Needle task.
@@ -41,18 +42,23 @@ git lfs install
 ## Highlights
 =======
 It implements a complete robot learning pipeline for the Lift Needle benchmark, from demonstration collection to policy training and evaluation.
+=======
+This project extends the ORBIT-Surgical framework with a complete robot learning pipeline for surgical needle manipulation.
+
+The implemented pipeline includes state-machine benchmarking, demonstration collection, imitation learning, reinforcement learning, hybrid BC+PPO training, and automatic policy evaluation on the Lift Needle task.
+>>>>>>> eb1c7de (Revise README)
 
 ### Highlights
 
 >>>>>>> 7c80788 (Revise README)
 - State machine surgical needle benchmark
 - Automatic demonstration collection
-- Trajectory export and visualization
+- Trajectory collection, export and visualization
 - Behavior Cloning (BC) 
 - PPO
 - BC + PPO
-- Automatic checkpoint evaluation
-- Algorithms comparison
+- Automatic policy checkpoint evaluation
+- Algorithm comparison
 
 ## Setup
 
