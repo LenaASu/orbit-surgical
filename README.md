@@ -71,7 +71,54 @@ Each trajectory stores:
 ## Imitation Learning
 ### Behavior Cloning (BC)
 
+<<<<<<< HEAD
 1. Collect demonstrations with state machine for the environment `Isaac-Lift-Needle-PSM-IK-Abs-v0`:
+=======
+The following results were evaluated on the Lift Needle task. Behavior Cloning policy learns Cartesian motion commands. Gripper actuation is currently controlled by a hand-crafted schedule.
+PPO directly optimizes the manipulation policy through reinforcement learning.
+
+| Method | Demonstrations | Success Rate (50 Episodes) |
+|----------|----------|----------|
+| State Machine | N/A | 100% |
+| Behavior Cloning | 100 | 12% |
+| PPO | N/A | 20% |
+
+## Future Work
+
+- Increase demonstration dataset size and diversity
+- Learn gripper control directly from demonstrations
+- Learn full 8-DoF actions including orientation and gripper commands
+- Improve PPO performance through reward and hyperparameter optimization
+- Fine-tune PPO from BC initialization (BC + PPO)
+- Compare state machine, BC, RL, and BC + RL performance
+- (Optional) Train other imitation learning policies like DAgger, GAIL, etc.
+
+
+
+
+# ORBIT-Surgical (Original ORBIT-Surgical README)
+
+[![IsaacSim](https://img.shields.io/badge/IsaacSim-4.1.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
+[![Isaac Lab](https://img.shields.io/badge/IsaacLab-1.0.0-silver)](https://isaac-sim.github.io/IsaacLab)
+[![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
+[![Linux platform](https://img.shields.io/badge/platform-linux--64-orange.svg)](https://releases.ubuntu.com/20.04/)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://pre-commit.com/)
+
+## Overview
+
+ORBIT-Surgical is a physics-based surgical robot simulation framework with photorealistic rendering in NVIDIA Omniverse. ORBIT-Surgical leverages GPU parallelization to train reinforcement learning and imitation learning algorithms to facilitate study of robot learning to augment human surgical skills. ORBIT-Surgical is built upon [NVIDIA Isaac Sim](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html) to leverage the latest simulation capabilities for photo-realistic scenes and fast and accurate simulation.
+
+
+## Setup
+
+### Basic Setup
+
+ORBIT-Surgical is built upon NVIDIA [Isaac Sim](https://docs.omniverse.nvidia.com/isaacsim/latest/index.html) and [Isaac Lab](https://github.com/isaac-sim/IsaacLab). For detailed instructions on how to install these dependencies, please refer to the [Isaac Lab installation guide](https://isaac-sim.github.io/IsaacLab/source/setup/installation/index.html).
+
+Please follow the Isaac Sim [documentation](https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_workstation.html) to install the latest Isaac Sim release.
+
+Clone [Isaac Lab repository](https://github.com/isaac-sim/IsaacLab):
+>>>>>>> 1ae537e (Update README)
 
 ```bash
 ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/state_machine/lift_needle_sm.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 1 
