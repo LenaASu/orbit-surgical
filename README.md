@@ -112,7 +112,14 @@ ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/ppo_trai
 # run script for playing with 32 environments
 ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/ppo_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 32 
 ```
+
 ### BC + PPO
+
+Train an agent on `Isaac-Lift-Needle-PSM-IK-Abs-v0`:
+
+```bash
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/bc_rsl_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 1 
+```
 
 ### (Optional) TensorBoard: TensorFlow's visualization toolkit 
 
