@@ -13,6 +13,7 @@ This project extends the ORBIT-Surgical framework with a complete robot learning
 The implemented pipeline includes state-machine benchmarking, demonstration collection, imitation learning, reinforcement learning, hybrid BC+PPO training, and automatic policy evaluation on the Lift Needle task.
 =======
 This project investigates learning-based surgical manipulation in simulation using ORBIT-Surgical framework and Isaac Lab.
+<<<<<<< HEAD
 >>>>>>> b9ed86d (Update README)
 
 ### Highlights
@@ -38,6 +39,12 @@ git lfs install
 
 =======
 ## Highlights
+=======
+It implements a complete robot learning pipeline for the Lift Needle benchmark, from demonstration collection to policy training and evaluation.
+
+### Highlights
+
+>>>>>>> 7c80788 (Revise README)
 - State machine surgical needle benchmark
 - Automatic demonstration collection
 - Trajectory export and visualization
