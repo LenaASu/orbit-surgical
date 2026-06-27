@@ -8,9 +8,13 @@
 
 ## Overview
 
+<<<<<<< HEAD
 This project extends the ORBIT-Surgical framework with a complete robot learning pipeline for surgical needle manipulation.
 
 The implemented pipeline includes state-machine benchmarking, demonstration collection, imitation learning, reinforcement learning, hybrid BC+PPO training, and automatic policy evaluation on the Lift Needle task.
+=======
+This project investigates learning-based surgical manipulation in simulation using ORBIT-Surgical framework and Isaac Lab.
+>>>>>>> b9ed86d (Update README)
 
 ### Highlights
 
@@ -25,6 +29,7 @@ The implemented pipeline includes state-machine benchmarking, demonstration coll
 
 ## Setup
 
+<<<<<<< HEAD
 Once you are in the virtual environment, you do not need to use `${IsaacLab_PATH}/isaaclab.sh -p` to run python scripts. You can use the default python executable in your environment by running `python` or `python3`. However, for the rest of the documentation, we will assume that you are using `${IsaacLab_PATH}/isaaclab.sh -p` to run python scripts.
 
 <!-- Download and install the [Git Large File Storage (LFS)](https://git-lfs.com/). Once downloaded and installed, set up Git LFS for your user account by running:
@@ -32,6 +37,27 @@ Once you are in the virtual environment, you do not need to use `${IsaacLab_PATH
 git lfs install
 ``` -->
 
+=======
+## Highlights
+- State machine surgical needle benchmark
+- Automatic demonstration collection
+- Trajectory export and visualization
+- Behavior Cloning (BC) 
+- PPO
+- BC + PPO
+- Automatic checkpoint evaluation
+- Algorithms comparison
+
+## Setup
+
+Once you are in the virtual environment, you do not need to use `${IsaacLab_PATH}/isaaclab.sh -p` to run python scripts. You can use the default python executable in your environment by running `python` or `python3`. However, for the rest of the documentation, we will assume that you are using `${IsaacLab_PATH}/isaaclab.sh -p` to run python scripts.
+
+<!-- Download and install the [Git Large File Storage (LFS)](https://git-lfs.com/). Once downloaded and installed, set up Git LFS for your user account by running:
+```bash
+git lfs install
+``` -->
+
+>>>>>>> b9ed86d (Update README)
 Clone this repository to a directory **outside** the Isaac Lab installation directory:
 
 ```bash
@@ -40,13 +66,21 @@ git clone https://github.com/LenaASu/orbit-surgical.git
 
 ## Benchmark (State Machine)
 
+<<<<<<< HEAD
 <p align="center">
   <img src="media/success_benchmark.png" width="300">
 </p>
+=======
+<img width="460.5" height="423.5" alt="success_benchmark" src="https://github.com/user-attachments/assets/f681bb24-c5ea-4648-a105-8a9747597f7e" />
+>>>>>>> b9ed86d (Update README)
 
 The state machine baseline successfully grasps and lifts a suture needle and is used to generate demonstration trajectories for imitation learning.
 
 ### Benchmark Video
+<<<<<<< HEAD
+=======
+
+>>>>>>> b9ed86d (Update README)
 https://github.com/user-attachments/assets/07509bdc-0bed-4780-8f30-1dbccac22174
 
 ## Dataset Statistics
@@ -70,6 +104,7 @@ Each trajectory stores:
 
 ## Imitation Learning
 ### Behavior Cloning (BC)
+<<<<<<< HEAD
 
 1. Collect demonstrations with state machine for the environment `Isaac-Lift-Needle-PSM-IK-Abs-v0`:
 
@@ -127,6 +162,58 @@ ${IsaacLab_PATH}/isaaclab.sh -p -m tensorboard.main --logdir=logs
 
 ## Results
 
+=======
+
+1. Collect demonstrations with state machine for the environment `Isaac-Lift-Needle-PSM-IK-Abs-v0`:
+
+```bash
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/state_machine/lift_needle_sm.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 1 
+```
+
+2. (Optional) Split the dataset into train and validation set: 
+
+```bash
+# split data
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/robomimic/tools/split_train_val.py logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/hdf_dataset.hdf5 --ratio 0.2
+```
+
+3. Train a BC agent for `Isaac-Lift-Needle-PSM-IK-Abs-v0`. `BCPOlicy` was inspired by [Minari](https://minari.farama.org/tutorials/using_datasets/behavioral_cloning/) and [Imitation](https://imitation.readthedocs.io/en/latest/algorithms/bc.html)
+
+```bash
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/bc_mse_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 
+```
+
+4. Play the learned model to visualize results:
+
+```bash
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/bc_mse_eval.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --checkpoint /PATH/TO/model.pth
+```
+
+## Reinforcement Learning
+### PPO
+
+Train an agent on `Isaac-Lift-Needle-PSM-IK-Abs-v0` with [RSL-RL](https://github.com/leggedrobotics/rsl_rl):
+
+```bash
+# run script for training
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/ppo_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --headless
+# run script for playing with 32 environments
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/ppo_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 32 
+```
+### BC + PPO
+
+### (Optional) TensorBoard: TensorFlow's visualization toolkit 
+
+Monitor the training progress stored in the `logs` directory on [Tensorboard](https://www.tensorflow.org/tensorboard):
+
+```bash
+# execute from the root directory of the repository
+${IsaacLab_PATH}/isaaclab.sh -p -m tensorboard.main --logdir=logs
+```
+
+## Results
+
+>>>>>>> b9ed86d (Update README)
 The following results were evaluated on the Lift Needle task. Behavior Cloning policy learns Cartesian motion commands. Gripper actuation is currently controlled by a hand-crafted schedule.
 PPO directly optimizes the manipulation policy through reinforcement learning.
 
@@ -134,7 +221,11 @@ PPO directly optimizes the manipulation policy through reinforcement learning.
 |----------|----------|----------|
 | State Machine | N/A | 100% |
 | Behavior Cloning | 100 | 12% |
+<<<<<<< HEAD
 | PPO | N/A | 82% |
+=======
+| PPO | N/A | 20% |
+>>>>>>> b9ed86d (Update README)
 
 ## Future Improvement
 
