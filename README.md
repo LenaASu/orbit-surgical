@@ -66,20 +66,29 @@ git clone https://github.com/LenaASu/orbit-surgical.git
 ## Benchmark (State Machine)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <p align="center">
   <img src="media/success_benchmark.png" width="300">
 </p>
 =======
 <img width="460.5" height="423.5" alt="success_benchmark" src="https://github.com/user-attachments/assets/f681bb24-c5ea-4648-a105-8a9747597f7e" />
 >>>>>>> b9ed86d (Update README)
+=======
+<p align="center">
+  <img src="media/success_benchmark.png" width="300">
+</p>
+>>>>>>> a81a1d6 (Update README)
 
 The state machine baseline successfully grasps and lifts a suture needle and is used to generate demonstration trajectories for imitation learning.
 
 ### Benchmark Video
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 https://github.com/user-attachments/assets/ce90d0ef-4e73-4fb3-91ab-396f7ee821f4
 =======
+=======
+>>>>>>> a81a1d6 (Update README)
 https://github.com/user-attachments/assets/07509bdc-0bed-4780-8f30-1dbccac22174
 >>>>>>> b9ed86d (Update README)
 
