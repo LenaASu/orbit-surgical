@@ -1,4 +1,3 @@
-
 # Learning-Based Surgical Needle Manipulation in ORBIT-Surgical
 
 [![IsaacSim](https://img.shields.io/badge/IsaacSim-4.5.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
@@ -47,7 +46,9 @@ git clone https://github.com/LenaASu/orbit-surgical.git
 The state machine baseline successfully grasps and lifts a suture needle and is used to generate demonstration trajectories for imitation learning.
 
 ### Benchmark Video
-https://github.com/user-attachments/assets/07509bdc-0bed-4780-8f30-1dbccac22174
+
+https://github.com/user-attachments/assets/3ec9e043-f6b4-4159-8818-f4a172bb5485
+
 
 ## Dataset Statistics
 
