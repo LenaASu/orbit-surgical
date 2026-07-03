@@ -1,6 +1,9 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 10efb26 (Fixed API)
 =======
 >>>>>>> 10efb26 (Fixed API)
 # Copyright (c) 2022-2024, The Isaac Lab Project Developers.
@@ -9,12 +12,15 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 16fef0a (Test bc+ppo)
 =======
 >>>>>>> 10efb26 (Fixed API)
 =======
 >>>>>>> 16fef0a (Test bc+ppo)
+=======
+>>>>>>> 10efb26 (Fixed API)
 """Script to train RL agent with pre-trained BC and RSL-RL."""
 
 """Launch Isaac Sim Simulator first."""
@@ -45,6 +51,7 @@ parser.add_argument(
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     default="/home/lena/Documents/GitHub/orbit-surgical/source/standalone/environments/learning/policies/bc_train.pt", 
 =======
     default="/home/lena/Documents/GitHub/orbit-surgical/source/standalone/environments/learning/policies/bc_actor_rsl.pt", 
@@ -55,6 +62,9 @@ parser.add_argument(
 =======
     default="/home/lena/Documents/GitHub/orbit-surgical/source/standalone/environments/learning/policies/bc_actor_rsl.pt", 
 >>>>>>> 16fef0a (Test bc+ppo)
+=======
+    default="/home/lena/Documents/GitHub/orbit-surgical/source/standalone/environments/learning/policies/bc_train.pt", 
+>>>>>>> 10efb26 (Fixed API)
     help="Path to RSL-RL-Compatible BC actor checkpoint."
     )
 # append RSL-RL cli arguments
