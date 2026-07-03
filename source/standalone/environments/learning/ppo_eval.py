@@ -107,7 +107,7 @@ if args_cli.checkpoint is None:
 >>>>>>> a3975c7 (Eval ppo)
 =======
     # args_cli.checkpoint = "/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
-    args_cli.chekpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_00.pt"
+    args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_00.pt"
     # args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
 >>>>>>> 16fef0a (Test bc+ppo)
 
