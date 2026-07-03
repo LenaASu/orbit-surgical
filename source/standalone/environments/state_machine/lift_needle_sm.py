@@ -403,8 +403,12 @@ def main():
                 episode_id += 1
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                 if success_cnt >= target_success:
                     print_h5_summary(save_path)
+=======
+                if success_cnt >= target_success:
+>>>>>>> 8ddb09e (Save as h5 works)
                     break
 
                 # reset
@@ -415,10 +419,13 @@ def main():
                 actions[:, 3] = 1.0
                 
                 continue
+<<<<<<< HEAD
 =======
                 raw_env.reset()
                 base_env.sim.step()
 >>>>>>> 2622ce1 (Save as h5)
+=======
+>>>>>>> 8ddb09e (Save as h5 works)
 
             # advance state machine
             actions = pick_sm.compute(
@@ -436,7 +443,11 @@ def main():
                 print("success_cnt: ", success_cnt)
                 print("timeout_cnt: ", timeout_cnt)
                 print("drop_cnt: ", drop_cnt)
+<<<<<<< HEAD
                 # print("obs_dict_policy: ", obs_dict["policy"])
+=======
+                print("obs_dict_policy: ", obs_dict["policy"])
+>>>>>>> 8ddb09e (Save as h5 works)
                 # print("ee pose input[0]: ", torch.cat([tcp_rest_position_b, tcp_rest_orientation], dim=-1))
                 # print("object pose input[0]: ", torch.cat([object_position_b, object_orientation], dim=-1))
                 # print("desired object pose[0]: ", desired_pose[0])
