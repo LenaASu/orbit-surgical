@@ -42,7 +42,11 @@ simulation_app = app_launcher.app
 
 import gymnasium as gym
 import torch
+<<<<<<< HEAD
 from h5helper import save_demo_to_hdf5, print_h5_summary
+=======
+from tohdf5 import save_demo_to_hdf5
+>>>>>>> 2622ce1 (Save as h5)
 from collections.abc import Sequence
 
 import warp as wp
@@ -256,7 +260,11 @@ def main():
     )
     env_cfg.observations.policy.concatenate_terms = False
     # create environment
+<<<<<<< HEAD
     raw_env = gym.make(args_cli.task, cfg=env_cfg)
+=======
+    raw_env = gym.make("Isaac-Lift-Needle-PSM-IK-Abs-v0", cfg=env_cfg)
+>>>>>>> 2622ce1 (Save as h5)
 
     # record video
     # raw_env = gym.wrappers.RecordVideo(
@@ -297,7 +305,11 @@ def main():
     drop_log = 0
     drop_cnt = 0
     num_episodes = 3 # set number of episodes
+<<<<<<< HEAD
     target_success = 50 # set number of successful trajs
+=======
+    target_success = 10 # set number of successful trajs
+>>>>>>> 2622ce1 (Save as h5)
     episode_saved = False # init bool for saving traj
     # max_steps = num_episodes * episode_length
     
@@ -338,11 +350,15 @@ def main():
                 "episode_id": episode_id,
                 "sm_state": pick_sm.sm_state.detach().cpu(),
 
+<<<<<<< HEAD
                 "obs": {
                     "policy": {
                         k: v.detach().cpu() for k, v in obs_dict["policy"].items()
                     }
                 },
+=======
+                "obs": obs_dict["policy"].cpu(),
+>>>>>>> 2622ce1 (Save as h5)
                 "action": actions.detach().cpu(),
                 "reward": reward.detach().cpu(),
                 "ee_pos": tcp_rest_position.detach().cpu(),
@@ -354,8 +370,11 @@ def main():
                 "timeout_log": timeout_log,
             })
 
+<<<<<<< HEAD
             save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_50_v3.hdf5"
             
+=======
+>>>>>>> 2622ce1 (Save as h5)
             if dones.any():
                 success_log = info["log"]["Episode_Termination/object_lifted"]
                 timeout_log = info["log"]["Episode_Termination/time_out"]
@@ -364,7 +383,12 @@ def main():
                 if success_log == 1:
                     success_cnt += 1
                    
+<<<<<<< HEAD
                     save_demo_to_hdf5(save_path, episode_traj, success_cnt - 1, args_cli.task)
+=======
+                    save_path = f"source/standalone/environments/data/lift_n_trajs_100_v3/lift_n_1_dataset_Abs.hdf5"
+                    save_demo_to_hdf5(save_path, episode_traj, success_cnt - 1)
+>>>>>>> 2622ce1 (Save as h5)
                     print(f"Saved demo_{success_cnt - 1}")
                     # episode_saved = True
 
@@ -378,6 +402,7 @@ def main():
                 episode_step = 0
                 episode_id += 1
 
+<<<<<<< HEAD
                 if success_cnt >= target_success:
                     print_h5_summary(save_path)
                     break
@@ -390,6 +415,10 @@ def main():
                 actions[:, 3] = 1.0
                 
                 continue
+=======
+                raw_env.reset()
+                base_env.sim.step()
+>>>>>>> 2622ce1 (Save as h5)
 
             # advance state machine
             actions = pick_sm.compute(
