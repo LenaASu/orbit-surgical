@@ -1,3 +1,8 @@
+# Copyright (c) 2022-2024, The Isaac Lab Project Developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 """Script to train RL agent with pre-trained BC and RSL-RL."""
 
 """Launch Isaac Sim Simulator first."""
@@ -25,7 +30,7 @@ parser.add_argument("--max_iterations", type=int, default=2000, help="RL Policy 
 parser.add_argument(
     "--bc_checkpoint", 
     type=str, 
-    default="/home/lena/Documents/GitHub/orbit-surgical/source/standalone/environments/learning/policies/bc_actor_rsl.pt", 
+    default="/home/lena/Documents/GitHub/orbit-surgical/source/standalone/environments/learning/policies/bc_train.pt", 
     help="Path to RSL-RL-Compatible BC actor checkpoint."
     )
 # append RSL-RL cli arguments
