@@ -371,8 +371,17 @@ def main():
                 episode_step = 0
                 episode_id += 1
 
+                if success_cnt >= target_success:
+                    break
+
+                # reset
                 raw_env.reset()
                 base_env.sim.step()
+                pick_sm.reset_idx()
+                actions = torch.zeros(base_env.action_space.shape, device=base_env.device)
+                actions[:, 3] = 1.0
+                
+                continue
 
             # advance state machine
             actions = pick_sm.compute(
@@ -388,6 +397,8 @@ def main():
                 print("step: ", step_cnt)
                 print("episode: ", episode_id)
                 print("success_cnt: ", success_cnt)
+                print("timeout_cnt: ", timeout_cnt)
+                print("drop_cnt: ", drop_cnt)
                 print("obs_dict_policy: ", obs_dict["policy"])
                 # print("ee pose input[0]: ", torch.cat([tcp_rest_position_b, tcp_rest_orientation], dim=-1))
                 # print("object pose input[0]: ", torch.cat([object_position_b, object_orientation], dim=-1))
