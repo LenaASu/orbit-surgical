@@ -47,8 +47,7 @@ The state machine baseline successfully grasps and lifts a suture needle and is 
 
 ### Benchmark Video
 
-https://github.com/user-attachments/assets/3ec9e043-f6b4-4159-8818-f4a172bb5485
-
+https://github.com/user-attachments/assets/ce90d0ef-4e73-4fb3-91ab-396f7ee821f4
 
 ## Dataset Statistics
 
