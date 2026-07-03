@@ -41,6 +41,7 @@ simulation_app = app_launcher.app
 
 import gymnasium as gym
 import torch
+from tohdf5 import save_demo_to_hdf5
 from collections.abc import Sequence
 
 import warp as wp
@@ -139,18 +140,13 @@ def infer_state_machine(
             sm_wait_time[tid] = 0.0
     elif state == PickSmState.LIFT_OBJECT:
         des_ee_pose[tid] = des_object_pose[tid]
-        # des_ee_pose[tid] = wp.transform_multiply(offset[tid], object_pose)
         gripper_state[tid] = GripperState.CLOSE
         # TODO: error between current and desired ee pose below threshold
         # wait for a while
         if sm_wait_time[tid] >= PickSmWaitTime.LIFT_OBJECT:
             # move to next state and reset wait time
             sm_state[tid] = PickSmState.LIFT_OBJECT
-            # sm_state[tid] = PickSmState.COMPLETE
             sm_wait_time[tid] = 0.0
-    # elif state == PickSmState.COMPLETE:
-    #     des_ee_pose[tid] = des_ee_pose[tid]
-    #     gripper_state[tid] = GripperState.CLOSE
 
     # increment wait time
     sm_wait_time[tid] = sm_wait_time[tid] + dt[tid]
@@ -259,11 +255,7 @@ def main():
     )
     # create environment
     raw_env = gym.make("Isaac-Lift-Needle-PSM-IK-Abs-v0", cfg=env_cfg)
-    # raw_env = gym.make("Isaac-Lift-Needle-PSM-IK-Abs-v0", cfg=env_cfg, render_mode="PARTIAL_RENDERING")
-    # raw_env = gym.make("Isaac-Lift-Needle-PSM-IK-Abs-v0", cfg=env_cfg, render_mode=[None, 'human', 'rgb_array'])
-    # raw_env = gym.make("Isaac-Lift-Needle-PSM-IK-Abs-v0", cfg=env_cfg, render_mode="rgb_array")
-    # raw_env = gym.make("Isaac-Lift-Needle-PSM-IK-Abs-v0", cfg=env_cfg, render_mode="FULL_RENDERING")
-    
+
     # record video
     # raw_env = gym.wrappers.RecordVideo(
     #     raw_env,
@@ -290,17 +282,20 @@ def main():
 
     # Create traj set
     episode_traj = []
-    success_traj = []
     episode_id = 1
     episode_step = 0
     # episode_length = env_cfg.episode_length_s / (env_cfg.sim.dt * env_cfg.decimation)
     episode_length = base_env.max_episode_length
     
-    
     step_cnt = 0
+    success_log = 0
     success_cnt = 0
+    timeout_log = 0
+    timeout_cnt = 0
+    drop_log = 0
+    drop_cnt = 0
     num_episodes = 3 # set number of episodes
-    target_success = 100 # set number of successful trajs
+    target_success = 10 # set number of successful trajs
     episode_saved = False # init bool for saving traj
     # max_steps = num_episodes * episode_length
     
@@ -312,14 +307,6 @@ def main():
             # step environment
             obs_dict, reward, terminated, truncated, info = raw_env.step(actions)
             dones = terminated | truncated
-            # dones = raw_env.step(actions)[-2]
-
-            # success
-            # object_listed = base_env.termination_manager.get_term["object_lifted"]
-            success_log = info["log"]["Episode_Termination/object_lifted"]
-            # success_cnt += 1
-            timeout_log = info["log"]["Episode_Termination/time_out"]
-            # timeout_cnt += 1
 
             # observations
             robot: RigidObject = base_env.scene["robot"]
@@ -342,6 +329,61 @@ def main():
             desired_pose = base_env.command_manager.get_command("object_pose")
 
 
+            # Add traj
+            # if step_cnt % 5 == 0:
+            episode_traj.append({
+                "step": step_cnt,
+                "episode_id": episode_id,
+                "sm_state": pick_sm.sm_state.detach().cpu(),
+
+                "obs": obs_dict["policy"].cpu(),
+                "action": actions.detach().cpu(),
+                "reward": reward.detach().cpu(),
+                "ee_pos": tcp_rest_position.detach().cpu(),
+                "object_pos": object_position.detach().cpu(),
+                
+                "terminated": terminated.detach().cpu(),
+                "truncated": truncated.detach().cpu(),
+                "object_lifted_log": success_log,
+                "timeout_log": timeout_log,
+            })
+
+            if dones.any():
+                success_log = info["log"]["Episode_Termination/object_lifted"]
+                timeout_log = info["log"]["Episode_Termination/time_out"]
+                drop_log = info["log"]["Episode_Termination/object_dropping"]
+
+                if success_log == 1:
+                    success_cnt += 1
+                   
+                    save_path = f"source/standalone/environments/data/lift_n_trajs_100_v3/lift_n_1_dataset_Abs.hdf5"
+                    save_demo_to_hdf5(save_path, episode_traj, success_cnt - 1)
+                    print(f"Saved demo_{success_cnt - 1}")
+                    # episode_saved = True
+
+                if timeout_log == 1:
+                    timeout_cnt += 1
+
+                if drop_log == 1:
+                    drop_cnt += 1
+
+                episode_traj = []
+                episode_step = 0
+                episode_id += 1
+
+                raw_env.reset()
+                base_env.sim.step()
+
+            # advance state machine
+            actions = pick_sm.compute(
+                torch.cat([tcp_rest_position_b, tcp_rest_orientation], dim=-1),
+                torch.cat([object_position_b, object_orientation], dim=-1),
+                desired_pose,
+                
+            )
+            step_cnt += 1
+            episode_step += 1
+
             if step_cnt % 10 == 0:
                 print("step: ", step_cnt)
                 print("episode: ", episode_id)
@@ -361,78 +403,7 @@ def main():
                 print("truncated: ", truncated)
                 # print(info)
 
-            # Add traj
-            # if step_cnt % 5 == 0:
-            episode_traj.append({
-                "step": step_cnt,
-                "episode_id": episode_id,
-                "sm_state": pick_sm.sm_state.detach().cpu(),
-
-                "obs": obs_dict["policy"].cpu(),
-                "action": actions.detach().cpu(),
-                "reward": reward.detach().cpu(),
-                "ee_pos": tcp_rest_position.detach().cpu(),
-                "object_pos": object_position.detach().cpu(),
-                
-                "terminated": terminated.detach().cpu(),
-                "truncated": truncated.detach().cpu(),
-                "object_lifted_log": success_log,
-                "timeout_log": timeout_log,
-            })
-            # if success == 1:
-            if success_log > 0 and not episode_saved and len(episode_traj) > 50:
-                success_cnt += 1
-                episode_saved = True
-                
-                torch.save(episode_traj, f"source/standalone/environments/imitation_learning/lift_n_trajs_100_v2/lift_n_1_success_ep{episode_id}.pt")
-                # print(f"Saved success traj at ep{episode_id}.")
-                
-       
-            # reset state machine
-            if dones.any() or success_log > 0:
-                # if success > 0:
-                #     success_cnt += 1
-                #     torch.save(episode_traj, f"lift_n_1_3_success_ep{episode_id}.pt")
-                    # print(f"Saved success traj at ep{episode_id}.")
-                    
-
-                pick_sm.reset_idx(dones.nonzero(as_tuple=False).squeeze(-1))
-                episode_traj = []
-                episode_id += 1
-                episode_step = 0
-                episode_saved = False
-
-                episode_initial_object_z = None
-                raw_env.reset()
-                base_env.sim.step()
-                actions = torch.zeros(base_env.action_space.shape, device=base_env.device)
-                actions[:, 3] = 1.0
-
-                step_cnt += 1
-
-                # if episode_id > num_episodes:
-                #     break
-                
-                if success_cnt >= target_success:
-                    break
-                
-                continue
-            
-            else:
-                episode_step += 1
-
-                # advance state machine
-                actions = pick_sm.compute(
-                    torch.cat([tcp_rest_position_b, tcp_rest_orientation], dim=-1),
-                    torch.cat([object_position_b, object_orientation], dim=-1),
-                    desired_pose,
-                    
-                )
-                step_cnt += 1
-            
-    # Save traj
-    # torch.save(episode_traj, "lift_n_1_3.pt")
-    # print("Saved trajectory to lift_n.pt")
+           
     # close the environment
     raw_env.close()
 
