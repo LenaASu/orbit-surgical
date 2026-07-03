@@ -20,7 +20,7 @@ parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
-parser.add_argument("--task", type=str, default=None, help="Name of the task.")
+parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-Play-v0", help="Name of the task.")
 parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
@@ -41,7 +41,7 @@ import torch
 from rsl_rl.runners import OnPolicyRunner
 
 import isaaclab.app  # noqa: F401
-from isaaclab.app.utils import get_checkpoint_path, parse_env_cfg
+from isaaclab_tasks.utils import get_checkpoint_path, parse_env_cfg
 from isaaclab_rl.rsl_rl import (
     RslRlOnPolicyRunnerCfg,
     RslRlVecEnvWrapper,
@@ -83,9 +83,9 @@ def main():
     # export policy to onnx
     export_model_dir = os.path.join(os.path.dirname(resume_path), "exported")
     export_policy_as_jit(
-        ppo_runner.alg.actor_critic, ppo_runner.obs_normalizer, path=export_model_dir, filename="policy.pt"
+        ppo_runner.alg.policy, ppo_runner.obs_normalizer, path=export_model_dir, filename="policy.pt"
     )
-    export_policy_as_onnx(ppo_runner.alg.actor_critic, path=export_model_dir, filename="policy.onnx")
+    export_policy_as_onnx(ppo_runner.alg.policy, path=export_model_dir, filename="policy.onnx")
 
     # reset environment
     obs, _ = env.get_observations()

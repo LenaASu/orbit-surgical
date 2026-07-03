@@ -25,7 +25,7 @@ parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
-parser.add_argument("--task", type=str, default=None, help="Name of the task.")
+parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0", help="Name of the task.")
 parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
 parser.add_argument("--max_iterations", type=int, default=None, help="RL Policy training iterations.")
 # append AppLauncher cli args
@@ -52,13 +52,12 @@ from stable_baselines3.common.callbacks import CheckpointCallback
 from stable_baselines3.common.logger import configure
 from stable_baselines3.common.vec_env import VecNormalize
 
-from isaaclab_tasks.utils.dict import print_dict
-from isaaclab_tasks.utils.io import dump_pickle, dump_yaml
+from isaaclab.utils.dict import print_dict
+from isaaclab.utils.io import dump_pickle, dump_yaml
 
 import isaaclab.app  # noqa: F401
-from isaaclab.app.utils import load_cfg_from_registry, parse_env_cfg
-from isaaclab.app.utils.wrappers.sb3 import Sb3VecEnvWrapper, process_sb3_cfg
-
+from isaaclab_tasks.utils import load_cfg_from_registry, parse_env_cfg
+from isaaclab_rl.sb3 import Sb3VecEnvWrapper, process_sb3_cfg
 import orbit.surgical.tasks  # noqa: F401
 
 
