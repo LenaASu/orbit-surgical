@@ -27,6 +27,7 @@ parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
+parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0", help="Name of the task.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
@@ -41,7 +42,7 @@ simulation_app = app_launcher.app
 
 import gymnasium as gym
 import torch
-from tohdf5 import save_demo_to_hdf5
+from h5helper import save_demo_to_hdf5, print_h5_summary
 from collections.abc import Sequence
 
 import warp as wp
@@ -248,13 +249,13 @@ class PickAndLiftSm:
 def main():
     # parse configuration
     env_cfg: LiftEnvCfg = parse_env_cfg(
-        "Isaac-Lift-Needle-PSM-IK-Abs-v0",
+        args_cli.task,
         device=args_cli.device,
         num_envs=args_cli.num_envs,
         use_fabric=not args_cli.disable_fabric,
     )
     # create environment
-    raw_env = gym.make("Isaac-Lift-Needle-PSM-IK-Abs-v0", cfg=env_cfg)
+    raw_env = gym.make(args_cli.task, cfg=env_cfg)
 
     # record video
     # raw_env = gym.wrappers.RecordVideo(
@@ -295,7 +296,7 @@ def main():
     drop_log = 0
     drop_cnt = 0
     num_episodes = 3 # set number of episodes
-    target_success = 10 # set number of successful trajs
+    target_success = 1 # set number of successful trajs
     episode_saved = False # init bool for saving traj
     # max_steps = num_episodes * episode_length
     
@@ -348,6 +349,8 @@ def main():
                 "timeout_log": timeout_log,
             })
 
+            save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_1.hdf5"
+            
             if dones.any():
                 success_log = info["log"]["Episode_Termination/object_lifted"]
                 timeout_log = info["log"]["Episode_Termination/time_out"]
@@ -356,8 +359,7 @@ def main():
                 if success_log == 1:
                     success_cnt += 1
                    
-                    save_path = f"source/standalone/environments/data/lift_n_trajs_100_v3/lift_n_1_dataset_Abs.hdf5"
-                    save_demo_to_hdf5(save_path, episode_traj, success_cnt - 1)
+                    save_demo_to_hdf5(save_path, episode_traj, success_cnt - 1, args_cli.task)
                     print(f"Saved demo_{success_cnt - 1}")
                     # episode_saved = True
 
@@ -372,6 +374,7 @@ def main():
                 episode_id += 1
 
                 if success_cnt >= target_success:
+                    print_h5_summary(save_path)
                     break
 
                 # reset
