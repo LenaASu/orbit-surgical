@@ -7,7 +7,7 @@
 
 """Launch Isaac Sim Simulator first."""
 
-import argparse
+import argparse,h5py
 
 from isaaclab.app import AppLauncher
 
@@ -58,6 +58,29 @@ def main():
     # restore policy
     policy, _ = FileUtils.policy_from_checkpoint(ckpt_path=args_cli.checkpoint, device=device, verbose=True)
 
+    # HDF5
+    # with h5py.File(args_cli.checkpoint, "r") as f:
+    #     demo = f["data"]["demo_0000"]
+    #     actions = demo["actions"][:]
+
+    # obs_dict, _ = env.reset()
+
+    # for i, a in enumerate(actions):
+    #     action = torch.tensor(a, device=env.device, dtype=torch.float32).view(1, -1)
+    #     obs_dict, reward, terminated, truncated, info = env.step(action)
+
+    #     success = info["log"]["Episode_Termination/object_lifted"]
+    #     timeout = info["log"]["Episode_Termination/time_out"]
+    #     drop = info["log"]["Episode_Termination/object_dropping"]
+
+    #     print(i)
+    #     # print(i, "success", success, "timeout", timeout, "drop", drop, "reward", reward)
+
+    #     if success or timeout or drop or terminated or truncated:
+    #         print(i, "success", success, "timeout", timeout, "drop", drop, "reward", reward)
+    #         break
+
+    # BC eval
     # reset environment
     obs_dict, _ = env.reset()
 
