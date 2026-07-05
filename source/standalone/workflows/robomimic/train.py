@@ -86,7 +86,7 @@ def train(config, device):
     print("\n============= New Training Run with Config =============")
     print(config)
     print("")
-    log_dir, ckpt_dir, video_dir = TrainUtils.get_exp_dir(config)
+    log_dir, ckpt_dir, video_dir, *_ = TrainUtils.get_exp_dir(config)
     print(f">>> Saving logs into directory: {log_dir}")
     print(f">>> Saving checkpoints into directory: {ckpt_dir}")
     print(f">>> Saving videos into directory: {video_dir}")
@@ -101,15 +101,18 @@ def train(config, device):
     ObsUtils.initialize_obs_utils_with_config(config)
 
     # make sure the dataset exists
-    dataset_path = os.path.expanduser(config.train.data)
+    dataset_path = os.path.expanduser(config.train.data[0]["path"])
     if not os.path.exists(dataset_path):
         raise FileNotFoundError(f"Dataset at provided path {dataset_path} not found!")
 
     # load basic metadata from training file
     print("\n============= Loaded Environment Metadata =============")
-    env_meta = FileUtils.get_env_metadata_from_dataset(dataset_path=config.train.data)
+    env_meta = FileUtils.get_env_metadata_from_dataset(dataset_path=config.train.data[0]["path"])
     shape_meta = FileUtils.get_shape_metadata_from_dataset(
-        dataset_path=config.train.data, all_obs_keys=config.all_obs_keys, verbose=True
+        dataset_config=config.train, 
+        action_keys=config.train.action_keys, 
+        all_obs_keys=config.all_obs_keys,
+        verbose=True
     )
 
     if config.experiment.env is not None:
@@ -369,8 +372,15 @@ def main(args):
         raise ValueError("Please provide a task name through CLI arguments.")
 
     if args.dataset is not None:
-        config.train.data = args.dataset
-
+        with config.unlocked():
+            config.train.data = [
+                {
+                    "path": args.dataset,
+                    "hdf5_filter_key": "train",
+                    "hdf5_validation_filter_key": "valid"
+                }
+            ]
+            config.train.path = args.dataset
     if args.name is not None:
         config.experiment.name = args.name
 
@@ -405,12 +415,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dataset",
         type=str,
-        default=None,
+        default="/home/lena/Documents/GitHub/orbit-surgical/source/standalone/environments/data/datasets/lift_n_dataset_Abs_100.hdf5",
         help="(optional) if provided, override the dataset path defined in the config",
     )
 
-    parser.add_argument("--task", type=str, default=None, help="Name of the task.")
-    parser.add_argument("--algo", type=str, default=None, help="Name of the algorithm.")
+    parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0", help="Name of the task.")
+    parser.add_argument("--algo", type=str, default="bc", help="Name of the algorithm.")
 
     args = parser.parse_args()
 
