@@ -315,6 +315,7 @@ def main():
     num_episodes = 3 # set number of episodes
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     target_success = 50 # set number of successful trajs
 =======
     target_success = 10 # set number of successful trajs
@@ -322,6 +323,9 @@ def main():
 =======
     target_success = 1 # set number of successful trajs
 >>>>>>> b9840b1 (Added h5 summary)
+=======
+    target_success = 50 # set number of successful trajs
+>>>>>>> 71eec3b (Fixed API)
     episode_saved = False # init bool for saving traj
     # max_steps = num_episodes * episode_length
     
@@ -363,14 +367,20 @@ def main():
                 "sm_state": pick_sm.sm_state.detach().cpu(),
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 71eec3b (Fixed API)
                 "obs": {
                     "policy": {
                         k: v.detach().cpu() for k, v in obs_dict["policy"].items()
                     }
                 },
+<<<<<<< HEAD
 =======
                 "obs": obs_dict["policy"].cpu(),
 >>>>>>> 2622ce1 (Save as h5)
+=======
+>>>>>>> 71eec3b (Fixed API)
                 "action": actions.detach().cpu(),
                 "reward": reward.detach().cpu(),
                 "ee_pos": tcp_rest_position.detach().cpu(),
@@ -384,12 +394,16 @@ def main():
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_50_v3.hdf5"
             
 =======
 >>>>>>> 2622ce1 (Save as h5)
 =======
             save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_1.hdf5"
+=======
+            save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_50_v3.hdf5"
+>>>>>>> 71eec3b (Fixed API)
             
 >>>>>>> b9840b1 (Added h5 summary)
             if dones.any():
@@ -468,10 +482,14 @@ def main():
                 print("timeout_cnt: ", timeout_cnt)
                 print("drop_cnt: ", drop_cnt)
 <<<<<<< HEAD
+<<<<<<< HEAD
                 # print("obs_dict_policy: ", obs_dict["policy"])
 =======
                 print("obs_dict_policy: ", obs_dict["policy"])
 >>>>>>> 8ddb09e (Save as h5 works)
+=======
+                # print("obs_dict_policy: ", obs_dict["policy"])
+>>>>>>> 71eec3b (Fixed API)
                 # print("ee pose input[0]: ", torch.cat([tcp_rest_position_b, tcp_rest_orientation], dim=-1))
                 # print("object pose input[0]: ", torch.cat([object_position_b, object_orientation], dim=-1))
                 # print("desired object pose[0]: ", desired_pose[0])

@@ -7,7 +7,11 @@
 
 """Launch Isaac Sim Simulator first."""
 
+<<<<<<< HEAD
 import argparse,h5py
+=======
+import argparse
+>>>>>>> 71eec3b (Fixed API)
 
 from isaaclab.app import AppLauncher
 
@@ -58,6 +62,7 @@ def main():
     # restore policy
     policy, _ = FileUtils.policy_from_checkpoint(ckpt_path=args_cli.checkpoint, device=device, verbose=True)
 
+<<<<<<< HEAD
     # HDF5
     # with h5py.File(args_cli.checkpoint, "r") as f:
     #     demo = f["data"]["demo_0000"]
@@ -92,12 +97,23 @@ def main():
     drop_cnt = 0
 
     num_episodes = 50
+=======
+    # reset environment
+    obs_dict, _ = env.reset()
+    # robomimic only cares about policy observations
+    obs = obs_dict["policy"]
+
+    step = 0
+
+
+>>>>>>> 71eec3b (Fixed API)
 
     # simulate environment
     while simulation_app.is_running():
         # run everything in inference mode
         with torch.inference_mode():
             # compute actions
+<<<<<<< HEAD
             # actions = policy(obs)
             # actions = torch.from_numpy(actions).to(device=device).view(1, env.action_space.shape[1])
 
@@ -125,11 +141,21 @@ def main():
             obs_dict, reward, terminated, truncated, info = env.step(action)
             step += 1
             episode_step += 1
+=======
+            actions = policy(obs)
+            actions = torch.from_numpy(actions).to(device=device).view(1, env.action_space.shape[1])
+            # apply actions
+            obs_dict, reward, terminated, truncated, info = env.step(actions)
+            step += 1
+            # robomimic only cares about policy observations
+            obs = obs_dict["policy"]
+>>>>>>> 71eec3b (Fixed API)
 
             success = info["log"]["Episode_Termination/object_lifted"]
             timeout = info["log"]["Episode_Termination/time_out"]
             drop = info["log"]["Episode_Termination/object_dropping"]
 
+<<<<<<< HEAD
             print(f"success={success_cnt}, timeout={timeout_cnt}, drop={drop_cnt}")
             print("episode_step", episode_step)
             print("episode", episode_id)
@@ -151,6 +177,15 @@ def main():
             if episode_id > num_episodes:
                 print("Final success:", success_cnt)
                 print("Success_rate:", success_cnt / num_episodes)
+=======
+            print(f"success={success}, timeout={timeout}, drop={drop}")
+            print("step", step)
+            print("action", actions.cpu().numpy())
+            print("reward", reward)
+            print("object_pos", obs["object_position"].cpu().numpy())
+
+            if success or timeout or drop:
+>>>>>>> 71eec3b (Fixed API)
                 break
             
 

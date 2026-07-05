@@ -1,8 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import h5py, json
 =======
 import h5py
 >>>>>>> b9840b1 (Added h5 summary)
+=======
+import h5py, json
+>>>>>>> 71eec3b (Fixed API)
 import torch
 import pandas as pd
 from pathlib import Path
@@ -16,10 +20,14 @@ def save_demo_to_hdf5(h5_path, episode_traj, demo_id, task, env_id=0):
     h5_path.parent.mkdir(parents=True, exist_ok=True)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
    
 =======
     obs_f = torch.stack([x["obs"][env_id] for x in episode_traj], dim=0).numpy()
 >>>>>>> b9840b1 (Added h5 summary)
+=======
+   
+>>>>>>> 71eec3b (Fixed API)
     action_f = torch.stack([x["action"][env_id] for x in episode_traj], dim=0).numpy()
     reward_f = torch.stack([x["reward"][env_id] for x in episode_traj], dim=0).numpy()
     # dones_f = torch.cat([x["terminated"] | x["truncated"] for x in episode_traj], dim=0).numpy()
@@ -37,6 +45,7 @@ def save_demo_to_hdf5(h5_path, episode_traj, demo_id, task, env_id=0):
 
         demo_group = data_group.create_group(demo_name)
 <<<<<<< HEAD
+<<<<<<< HEAD
         obs_group = demo_group.create_group("obs")
         obs_dim = 0
 
@@ -51,6 +60,17 @@ def save_demo_to_hdf5(h5_path, episode_traj, demo_id, task, env_id=0):
         obs_group = demo_group.create_group("obs")
         obs_group.create_dataset("policy", data=obs_f, compression="gzip")
 >>>>>>> b9840b1 (Added h5 summary)
+=======
+        obs_group = demo_group.create_group("obs")
+        obs_dim = 0
+
+        obs_keys = episode_traj[0]["obs"]["policy"].keys()
+        # obs_group.create_dataset("policy", data=obs_f, compression="gzip")
+        for key in obs_keys:
+            obs_f = torch.stack([x["obs"]["policy"][key][env_id] for x in episode_traj], dim=0).cpu().numpy()
+            obs_group.create_dataset(key, data=obs_f, compression="gzip")
+            obs_dim += obs_f.shape[-1]
+>>>>>>> 71eec3b (Fixed API)
 
         demo_group.create_dataset("actions", data=action_f, compression="gzip")
         demo_group.create_dataset("rewards", data=reward_f, compression="gzip")
@@ -62,6 +82,7 @@ def save_demo_to_hdf5(h5_path, episode_traj, demo_id, task, env_id=0):
         
         data_group.attrs["collector"] = "sm" # state machine
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         data_group.attrs["obs_dim"] = obs_dim
         data_group.attrs["action_dim"] = action_f.shape[-1]
@@ -72,11 +93,20 @@ def save_demo_to_hdf5(h5_path, episode_traj, demo_id, task, env_id=0):
         })
 =======
         data_group.attrs["task"] = "lift_needle"
+=======
+>>>>>>> 71eec3b (Fixed API)
 
-        data_group.attrs["env_name"] = task
-        data_group.attrs["obs_dim"] = obs_f.shape[-1]
+        data_group.attrs["obs_dim"] = obs_dim
         data_group.attrs["action_dim"] = action_f.shape[-1]
+<<<<<<< HEAD
 >>>>>>> b9840b1 (Added h5 summary)
+=======
+        data_group.attrs["env_args"] = json.dumps({
+            "env_name": task,
+            "type": 2,
+            "env_kwargs": {},
+        })
+>>>>>>> 71eec3b (Fixed API)
 
 def analyze_h5(h5_path, save_path):
     with h5py.File(h5_path, 'r') as file:
@@ -119,11 +149,15 @@ def print_h5_summary(h5_path):
         print(f"Action dim          : {data.attrs['action_dim']}")
         print(f"Collector           : {data.attrs['collector']}")
 <<<<<<< HEAD
+<<<<<<< HEAD
         print(f"Environment         : {json.loads(data.attrs['env_args'])['env_name']}")
 =======
         print(f"Task                : {data.attrs['task']}")
         print(f"Environment         : {data.attrs['env_name']}")
 >>>>>>> b9840b1 (Added h5 summary)
+=======
+        print(f"Environment         : {json.loads(data.attrs['env_args'])['env_name']}")
+>>>>>>> 71eec3b (Fixed API)
         print("=" * 60)
 
 '''

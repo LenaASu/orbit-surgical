@@ -126,10 +126,17 @@ def train(config, device):
 
     # load basic metadata from training file
     print("\n============= Loaded Environment Metadata =============")
+<<<<<<< HEAD
     env_meta = FileUtils.get_env_metadata_from_dataset(dataset_path=dataset_path)
     shape_meta = FileUtils.get_shape_metadata_from_dataset(
         dataset_path=dataset_path, 
         # action_keys=None, 
+=======
+    env_meta = FileUtils.get_env_metadata_from_dataset(dataset_path=config.train.data[0]["path"])
+    shape_meta = FileUtils.get_shape_metadata_from_dataset(
+        dataset_config=config.train, 
+        action_keys=config.train.action_keys, 
+>>>>>>> 71eec3b (Fixed API)
         all_obs_keys=config.all_obs_keys,
         verbose=True
     )
