@@ -8,10 +8,14 @@
 """Launch Isaac Sim Simulator first."""
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import argparse,h5py
 =======
 import argparse
 >>>>>>> 71eec3b (Fixed API)
+=======
+import argparse,h5py
+>>>>>>> 34a0f6e (Finished robomimic BC, waiting for rsl_rl compatible BC)
 
 from isaaclab.app import AppLauncher
 
@@ -63,6 +67,9 @@ def main():
     policy, _ = FileUtils.policy_from_checkpoint(ckpt_path=args_cli.checkpoint, device=device, verbose=True)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 34a0f6e (Finished robomimic BC, waiting for rsl_rl compatible BC)
     # HDF5
     # with h5py.File(args_cli.checkpoint, "r") as f:
     #     demo = f["data"]["demo_0000"]
