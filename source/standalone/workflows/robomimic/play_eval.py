@@ -60,37 +60,74 @@ def main():
 
     # reset environment
     obs_dict, _ = env.reset()
-    # robomimic only cares about policy observations
-    obs = obs_dict["policy"]
 
     step = 0
+    episode_step = 0
+    episode_id = 1
+    success_cnt = 0
+    timeout_cnt = 0
+    drop_cnt = 0
 
-
+    num_episodes = 50
 
     # simulate environment
     while simulation_app.is_running():
         # run everything in inference mode
         with torch.inference_mode():
             # compute actions
-            actions = policy(obs)
-            actions = torch.from_numpy(actions).to(device=device).view(1, env.action_space.shape[1])
+            # actions = policy(obs)
+            # actions = torch.from_numpy(actions).to(device=device).view(1, env.action_space.shape[1])
+
+            policy_obs = obs_dict["policy"]
+
+            robomimic_obs = {
+                "joint_pos": policy_obs["joint_pos"],
+                "joint_vel": policy_obs["joint_vel"],
+                "object_position": policy_obs["object_position"],
+                "target_object_position": policy_obs["target_object_position"],
+            }
+
+            action = policy(robomimic_obs)
+            if not isinstance(action, torch.Tensor):
+                action = torch.from_numpy(action)
+            action = action.to(device=env.device).view(1, -1)
+
+            demo_action = policy_obs["actions"]
+            pred_action = action
+            print("pred:", pred_action.cpu().numpy())
+            print("demo:", demo_action.cpu().numpy())
+            print("MAE:", torch.mean(torch.abs(pred_action - demo_action)).item())
+
             # apply actions
-            obs_dict, reward, terminated, truncated, info = env.step(actions)
+            obs_dict, reward, terminated, truncated, info = env.step(action)
             step += 1
-            # robomimic only cares about policy observations
-            obs = obs_dict["policy"]
+            episode_step += 1
 
             success = info["log"]["Episode_Termination/object_lifted"]
             timeout = info["log"]["Episode_Termination/time_out"]
             drop = info["log"]["Episode_Termination/object_dropping"]
 
-            print(f"success={success}, timeout={timeout}, drop={drop}")
-            print("step", step)
-            print("action", actions.cpu().numpy())
+            print(f"success={success_cnt}, timeout={timeout_cnt}, drop={drop_cnt}")
+            print("episode_step", episode_step)
+            print("episode", episode_id)
+            print("action", action.cpu().numpy())
             print("reward", reward)
-            print("object_pos", obs["object_position"].cpu().numpy())
+            print("object_pos", policy_obs["object_position"].cpu().numpy())
 
-            if success or timeout or drop:
+            if (terminated | truncated):
+                if success:
+                    success_cnt += 1
+                if timeout:
+                    timeout_cnt += 1
+                if drop:
+                    drop_cnt += 1
+                print("Episode:", episode_id)
+                episode_id += 1
+                episode_step = 0
+
+            if episode_id > num_episodes:
+                print("Final success:", success_cnt)
+                print("Success_rate:", success_cnt / num_episodes)
                 break
             
 

@@ -100,17 +100,36 @@ def train(config, device):
     # read config to set up metadata for observation modalities (e.g. detecting rgb observations)
     ObsUtils.initialize_obs_utils_with_config(config)
 
+    raw_data = config.train.data
+
+    if isinstance(raw_data, list):
+        data_cfg = raw_data[0]
+        dataset_path = data_cfg["path"]
+        train_filter = data_cfg.get("hdf5_filter_key", None)
+        valid_filter = data_cfg.get("hdf5_validation_filter_key", None)
+    else:
+        dataset_path = raw_data
+        train_filter = getattr(config.train, "hdf5_filter_key", None)
+        valid_filter = getattr(config.train, "hdf5_validation_filter_key", None)
+
     # make sure the dataset exists
     dataset_path = os.path.expanduser(config.train.data[0]["path"])
     if not os.path.exists(dataset_path):
         raise FileNotFoundError(f"Dataset at provided path {dataset_path} not found!")
+    
+    # Add filter keys
+    config.unlock()
+    config.train.data = dataset_path
+    config.train.hdf5_filter_key = train_filter
+    config.train.hdf5_validation_filter_key = valid_filter
+    config.lock()
 
     # load basic metadata from training file
     print("\n============= Loaded Environment Metadata =============")
-    env_meta = FileUtils.get_env_metadata_from_dataset(dataset_path=config.train.data[0]["path"])
+    env_meta = FileUtils.get_env_metadata_from_dataset(dataset_path=dataset_path)
     shape_meta = FileUtils.get_shape_metadata_from_dataset(
-        dataset_config=config.train, 
-        action_keys=config.train.action_keys, 
+        dataset_path=dataset_path, 
+        # action_keys=None, 
         all_obs_keys=config.all_obs_keys,
         verbose=True
     )
