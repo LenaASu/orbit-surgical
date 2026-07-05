@@ -62,6 +62,11 @@ def main():
     obs_dict, _ = env.reset()
     # robomimic only cares about policy observations
     obs = obs_dict["policy"]
+
+    step = 0
+
+
+
     # simulate environment
     while simulation_app.is_running():
         # run everything in inference mode
@@ -70,9 +75,24 @@ def main():
             actions = policy(obs)
             actions = torch.from_numpy(actions).to(device=device).view(1, env.action_space.shape[1])
             # apply actions
-            obs_dict = env.step(actions)[0]
+            obs_dict, reward, terminated, truncated, info = env.step(actions)
+            step += 1
             # robomimic only cares about policy observations
             obs = obs_dict["policy"]
+
+            success = info["log"]["Episode_Termination/object_lifted"]
+            timeout = info["log"]["Episode_Termination/time_out"]
+            drop = info["log"]["Episode_Termination/object_dropping"]
+
+            print(f"success={success}, timeout={timeout}, drop={drop}")
+            print("step", step)
+            print("action", actions.cpu().numpy())
+            print("reward", reward)
+            print("object_pos", obs["object_position"].cpu().numpy())
+
+            if success or timeout or drop:
+                break
+            
 
     # close the simulator
     env.close()

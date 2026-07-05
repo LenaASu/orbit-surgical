@@ -46,6 +46,8 @@ gym.register(
     kwargs={
         "env_cfg_entry_point": ik_abs_env_cfg.NeedleLiftEnvCfg,
         "rsl_rl_cfg_entry_point": agents.rsl_rl_cfg.LiftNeedlePPORunnerCfg,
+        "robomimic_bc_cfg_entry_point": "source/extensions/orbit.surgical.tasks/orbit/surgical/tasks/surgical/lift/config/needle/agents/robomimic/bc.json",
+        "robomimic_bcq_cfg_entry_point": "source/extensions/orbit.surgical.tasks/orbit/surgical/tasks/surgical/lift/config/needle/agents/robomimic/bcq.json",
     },
     disable_env_checker=True,
 )
@@ -56,6 +58,8 @@ gym.register(
     kwargs={
         "env_cfg_entry_point": ik_abs_env_cfg.NeedleLiftEnvCfg_PLAY,
         "rsl_rl_cfg_entry_point": agents.rsl_rl_cfg.LiftNeedlePPORunnerCfg,
+        "robomimic_bc_cfg_entry_point": "source/extensions/orbit.surgical.tasks/orbit/surgical/tasks/surgical/lift/config/needle/agents/robomimic/bc.json",
+        "robomimic_bcq_cfg_entry_point": "source/extensions/orbit.surgical.tasks/orbit/surgical/tasks/surgical/lift/config/needle/agents/robomimic/bcq.json",
     },
     disable_env_checker=True,
 )

@@ -254,6 +254,7 @@ def main():
         num_envs=args_cli.num_envs,
         use_fabric=not args_cli.disable_fabric,
     )
+    env_cfg.observations.policy.concatenate_terms = False
     # create environment
     raw_env = gym.make(args_cli.task, cfg=env_cfg)
 
@@ -296,7 +297,7 @@ def main():
     drop_log = 0
     drop_cnt = 0
     num_episodes = 3 # set number of episodes
-    target_success = 1 # set number of successful trajs
+    target_success = 50 # set number of successful trajs
     episode_saved = False # init bool for saving traj
     # max_steps = num_episodes * episode_length
     
@@ -337,7 +338,11 @@ def main():
                 "episode_id": episode_id,
                 "sm_state": pick_sm.sm_state.detach().cpu(),
 
-                "obs": obs_dict["policy"].cpu(),
+                "obs": {
+                    "policy": {
+                        k: v.detach().cpu() for k, v in obs_dict["policy"].items()
+                    }
+                },
                 "action": actions.detach().cpu(),
                 "reward": reward.detach().cpu(),
                 "ee_pos": tcp_rest_position.detach().cpu(),
@@ -349,7 +354,7 @@ def main():
                 "timeout_log": timeout_log,
             })
 
-            save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_1.hdf5"
+            save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_50_v3.hdf5"
             
             if dones.any():
                 success_log = info["log"]["Episode_Termination/object_lifted"]
@@ -402,7 +407,7 @@ def main():
                 print("success_cnt: ", success_cnt)
                 print("timeout_cnt: ", timeout_cnt)
                 print("drop_cnt: ", drop_cnt)
-                print("obs_dict_policy: ", obs_dict["policy"])
+                # print("obs_dict_policy: ", obs_dict["policy"])
                 # print("ee pose input[0]: ", torch.cat([tcp_rest_position_b, tcp_rest_orientation], dim=-1))
                 # print("object pose input[0]: ", torch.cat([object_position_b, object_orientation], dim=-1))
                 # print("desired object pose[0]: ", desired_pose[0])
