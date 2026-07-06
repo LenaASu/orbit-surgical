@@ -36,11 +36,11 @@ parser.add_argument(
     "--checkpoint_dir",
     type=str,
     # default="/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test",
-    default="/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/",
+    default="/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-07-05_23-40-21",
 )
 
 FILE_PATH = Path(__file__).resolve().parent
-save_path = FILE_PATH / "results" / "bc_ppo_top5.csv"
+save_path = FILE_PATH / "results" / "bc_ppo_top5_v3.csv"
 
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
@@ -49,16 +49,22 @@ AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 32de857 (Finished ppo baseline)
 # if args_cli.checkpoint is None:
 #     # args_cli.checkpoint = "/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
 #     args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-07-05_23-40-21/model_999.pt"
 #     # args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
+<<<<<<< HEAD
 =======
 if args_cli.checkpoint is None:
     # args_cli.checkpoint = "/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
     args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_00.pt"
     # args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
 >>>>>>> 16fef0a (Test bc+ppo)
+=======
+>>>>>>> 32de857 (Finished ppo baseline)
 
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)

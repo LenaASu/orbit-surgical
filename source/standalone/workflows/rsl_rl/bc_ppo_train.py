@@ -31,10 +31,14 @@ parser.add_argument(
     "--bc_checkpoint", 
     type=str, 
 <<<<<<< HEAD
+<<<<<<< HEAD
     default="/home/lena/Documents/GitHub/orbit-surgical/logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/bc/20260704/models/model_epoch_200.pth", 
 =======
     default="/workspace_data/orbit-surgical/logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/0705v2100/20260705194344/models/model_epoch_200.pth", 
 >>>>>>> 34a0f6e (Finished robomimic BC, waiting for rsl_rl compatible BC)
+=======
+    default="/home/lena/Documents/GitHub/orbit-surgical/logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/bc/20260704/models/model_epoch_200.pth", 
+>>>>>>> 32de857 (Finished ppo baseline)
     help="Path to BC actor checkpoint."
     )
 # append RSL-RL cli arguments
@@ -120,6 +124,7 @@ def main():
     runner = OnPolicyRunner(env, agent_cfg.to_dict(), log_dir=log_dir, device=agent_cfg.device)
     checkpoint_file = torch.load(args_cli.bc_checkpoint, map_location=agent_cfg.device)
 <<<<<<< HEAD
+<<<<<<< HEAD
     print("checkpoint keys:", checkpoint_file.keys())
     print(type(checkpoint_file))
     bc_state_dict = checkpoint_file["model_state_dict"]
@@ -149,22 +154,38 @@ def main():
 =======
     # print("checkpoint keys:", checkpoint_file.keys())
     # print(type(checkpoint_file))
+=======
+    print("checkpoint keys:", checkpoint_file.keys())
+    print(type(checkpoint_file))
+>>>>>>> 32de857 (Finished ppo baseline)
     bc_state_dict = checkpoint_file["model_state_dict"]
     
-    # print("runner:", type(runner))
-    # print("runner.alg:", type(runner.alg))
-    # print("runner.alg attrs:", dir(runner.alg))
-    # print("runner.alg.actor_critic:", runner.alg.actor_critic)
-    # print("runner.alg.actor_critic.state_dict().keys()", runner.alg.actor_critic.state_dict().keys())
-    # print("runner.alg.policy:", runner.alg.policy)
-    # print("policy attrs:", dir(runner.alg.policy))
+    print("runner:", type(runner))
+    print("runner.alg:", type(runner.alg))
+    print("runner.alg attrs:", dir(runner.alg))
+    print("runner.alg.actor_critic:", runner.alg.actor_critic)
+    print("runner.alg.actor_critic.state_dict().keys()", runner.alg.actor_critic.state_dict().keys())
+    print("runner.alg.policy:", runner.alg.policy)
+    print("policy attrs:", dir(runner.alg.policy))
 
-    # for name, module in runner.alg.policy.named_modules():
-    #     print(name, module)
+    for name, module in runner.alg.policy.named_modules():
+        print(name, module)
 
     runner.alg.policy.actor.load_state_dict(bc_state_dict)
     print(f"[INFO]: Initialized PPO actor from BC checkpoint: {bc_state_dict}")
+<<<<<<< HEAD
 >>>>>>> 34a0f6e (Finished robomimic BC, waiting for rsl_rl compatible BC)
+=======
+    actor = runner.alg.policy.actor
+
+    # Load hdf5 obs/action
+    # obs = 
+    # action = 
+
+    # # Supervised train
+    # pred = actor(obs)
+    loss = torch.nn.functional.mse_loss(pred, action)
+>>>>>>> 32de857 (Finished ppo baseline)
 
     # write git state to logs
     runner.add_git_repo_to_log(__file__)
