@@ -37,38 +37,8 @@ parser.add_argument(
 )
 parser.add_argument(
     "--checkpoint", type=str,
-<<<<<<< HEAD
-=======
-<<<<<<<< HEAD:source/standalone/environments/learning/bc_eval.py
->>>>>>> 16fef0a (Test bc+ppo)
-<<<<<<< HEAD:source/standalone/environments/learning/bc_mse_eval.py
-<<<<<<< HEAD
-=======
-<<<<<<<< HEAD:source/standalone/environments/learning/bc_eval.py
->>>>>>> 16fef0a (Test bc+ppo)
-<<<<<<< HEAD:source/standalone/environments/learning/bc_mse_eval.py
     # default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
     default= "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_00.pt",
-=======
-    default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
->>>>>>> 2372a4d (Succeed in lifting with bc policy):source/standalone/environments/imitation_learning/eval_bc.py
-<<<<<<< HEAD
-=======
-========
-    # default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
-    default= "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_00.pt",
->>>>>>>> 16fef0a (Test bc+ppo):source/standalone/environments/learning/bc_mse_eval.py
->>>>>>> 16fef0a (Test bc+ppo)
-=======
-    default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
->>>>>>> 2372a4d (Succeed in lifting with bc policy):source/standalone/environments/imitation_learning/eval_bc.py
-<<<<<<< HEAD
-=======
-========
-    # default="source/standalone/environments/imitation_learning/policies/bc_lift_n_100_policy_200.pt", 
-    default= "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_00.pt",
->>>>>>>> 16fef0a (Test bc+ppo):source/standalone/environments/learning/bc_mse_eval.py
->>>>>>> 16fef0a (Test bc+ppo)
     help="Pytorch model checkpoint to load."
 )
 
@@ -210,23 +180,6 @@ def main():
         # run everything in inference mode
         with torch.inference_mode():
             # compute actions
-<<<<<<< HEAD
-=======
-<<<<<<<< HEAD:source/standalone/environments/learning/bc_eval.py
->>>>>>> 16fef0a (Test bc+ppo)
-<<<<<<< HEAD
-<<<<<<< HEAD:source/standalone/environments/learning/bc_mse_eval.py
-=======
-<<<<<<<< HEAD:source/standalone/environments/learning/bc_eval.py
-<<<<<<< HEAD:source/standalone/environments/learning/bc_mse_eval.py
-========
->>>>>>>> 16fef0a (Test bc+ppo):source/standalone/environments/learning/bc_mse_eval.py
->>>>>>> 16fef0a (Test bc+ppo)
-<<<<<<< HEAD
-=======
-========
->>>>>>>> 16fef0a (Test bc+ppo):source/standalone/environments/learning/bc_mse_eval.py
->>>>>>> 16fef0a (Test bc+ppo)
             actions = policy(obs)
 
             # only xyz
@@ -244,35 +197,6 @@ def main():
                 # print("actions shape:", actions.shape)
                 continue
 
-<<<<<<< HEAD
-=======
-<<<<<<<< HEAD:source/standalone/environments/learning/bc_eval.py
->>>>>>> 16fef0a (Test bc+ppo)
-<<<<<<< HEAD
-=======
-<<<<<<<< HEAD:source/standalone/environments/learning/bc_eval.py
->>>>>>> 16fef0a (Test bc+ppo)
-=======
-            xyz = policy(obs)
-            xyz = torch.clamp(xyz, -1.0, 1.0)
-            actions = torch.zeros((obs.shape[0], 8), device=obs.device)
-            actions[:, :3] = xyz
-            actions[:, 3] = 1.0
-            actions[:,4:7] = 0.0
-<<<<<<< HEAD:source/standalone/environments/learning/bc_mse_eval.py
->>>>>>> 2372a4d (Succeed in lifting with bc policy):source/standalone/environments/imitation_learning/eval_bc.py
-<<<<<<< HEAD
-=======
-========
->>>>>>>> 16fef0a (Test bc+ppo):source/standalone/environments/learning/bc_mse_eval.py
->>>>>>> 16fef0a (Test bc+ppo)
-=======
->>>>>>> 2372a4d (Succeed in lifting with bc policy):source/standalone/environments/imitation_learning/eval_bc.py
-<<<<<<< HEAD
-=======
-========
->>>>>>>> 16fef0a (Test bc+ppo):source/standalone/environments/learning/bc_mse_eval.py
->>>>>>> 16fef0a (Test bc+ppo)
             if episode_step < 180:
                 actions[:, 7] = 1.0
             elif episode_step < 300:

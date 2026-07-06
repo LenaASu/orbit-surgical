@@ -7,15 +7,7 @@
 
 """Launch Isaac Sim Simulator first."""
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 import argparse,h5py
-=======
-import argparse
->>>>>>> 71eec3b (Fixed API)
-=======
-import argparse,h5py
->>>>>>> 34a0f6e (Finished robomimic BC, waiting for rsl_rl compatible BC)
 
 from isaaclab.app import AppLauncher
 
@@ -66,10 +58,6 @@ def main():
     # restore policy
     policy, _ = FileUtils.policy_from_checkpoint(ckpt_path=args_cli.checkpoint, device=device, verbose=True)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 34a0f6e (Finished robomimic BC, waiting for rsl_rl compatible BC)
     # HDF5
     # with h5py.File(args_cli.checkpoint, "r") as f:
     #     demo = f["data"]["demo_0000"]
@@ -104,33 +92,12 @@ def main():
     drop_cnt = 0
 
     num_episodes = 50
-=======
-    # reset environment
-    obs_dict, _ = env.reset()
-
-    step = 0
-    episode_step = 0
-    episode_id = 1
-    success_cnt = 0
-    timeout_cnt = 0
-    drop_cnt = 0
-
-<<<<<<< HEAD
-
->>>>>>> 71eec3b (Fixed API)
-=======
-    num_episodes = 50
->>>>>>> 913edfe (Robomimic BC works)
 
     # simulate environment
     while simulation_app.is_running():
         # run everything in inference mode
         with torch.inference_mode():
             # compute actions
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 913edfe (Robomimic BC works)
             # actions = policy(obs)
             # actions = torch.from_numpy(actions).to(device=device).view(1, env.action_space.shape[1])
 
@@ -154,40 +121,19 @@ def main():
             print("demo:", demo_action.cpu().numpy())
             print("MAE:", torch.mean(torch.abs(pred_action - demo_action)).item())
 
-<<<<<<< HEAD
             # apply actions
             obs_dict, reward, terminated, truncated, info = env.step(action)
             step += 1
             episode_step += 1
-=======
-            actions = policy(obs)
-            actions = torch.from_numpy(actions).to(device=device).view(1, env.action_space.shape[1])
-=======
->>>>>>> 913edfe (Robomimic BC works)
-            # apply actions
-            obs_dict, reward, terminated, truncated, info = env.step(action)
-            step += 1
-<<<<<<< HEAD
-            # robomimic only cares about policy observations
-            obs = obs_dict["policy"]
->>>>>>> 71eec3b (Fixed API)
-=======
-            episode_step += 1
->>>>>>> 913edfe (Robomimic BC works)
 
             success = info["log"]["Episode_Termination/object_lifted"]
             timeout = info["log"]["Episode_Termination/time_out"]
             drop = info["log"]["Episode_Termination/object_dropping"]
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 913edfe (Robomimic BC works)
             print(f"success={success_cnt}, timeout={timeout_cnt}, drop={drop_cnt}")
             print("episode_step", episode_step)
             print("episode", episode_id)
             print("action", action.cpu().numpy())
-<<<<<<< HEAD
             print("reward", reward)
             print("object_pos", policy_obs["object_position"].cpu().numpy())
 
@@ -205,34 +151,6 @@ def main():
             if episode_id > num_episodes:
                 print("Final success:", success_cnt)
                 print("Success_rate:", success_cnt / num_episodes)
-=======
-            print(f"success={success}, timeout={timeout}, drop={drop}")
-            print("step", step)
-            print("action", actions.cpu().numpy())
-=======
->>>>>>> 913edfe (Robomimic BC works)
-            print("reward", reward)
-            print("object_pos", policy_obs["object_position"].cpu().numpy())
-
-<<<<<<< HEAD
-            if success or timeout or drop:
->>>>>>> 71eec3b (Fixed API)
-=======
-            if (terminated | truncated):
-                if success:
-                    success_cnt += 1
-                if timeout:
-                    timeout_cnt += 1
-                if drop:
-                    drop_cnt += 1
-                print("Episode:", episode_id)
-                episode_id += 1
-                episode_step = 0
-
-            if episode_id > num_episodes:
-                print("Final success:", success_cnt)
-                print("Success_rate:", success_cnt / num_episodes)
->>>>>>> 913edfe (Robomimic BC works)
                 break
             
 

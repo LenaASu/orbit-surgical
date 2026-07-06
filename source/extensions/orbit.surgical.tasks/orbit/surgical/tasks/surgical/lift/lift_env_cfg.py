@@ -231,10 +231,6 @@ class CurriculumCfg:
 
     # pass
 
-    # pass
-
-    # pass
-
 
 ##
 # Environment configuration

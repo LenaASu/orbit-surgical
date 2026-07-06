@@ -42,15 +42,7 @@ simulation_app = app_launcher.app
 
 import gymnasium as gym
 import torch
-<<<<<<< HEAD
-<<<<<<< HEAD
 from h5helper import save_demo_to_hdf5, print_h5_summary
-=======
-from tohdf5 import save_demo_to_hdf5
->>>>>>> 2622ce1 (Save as h5)
-=======
-from h5helper import save_demo_to_hdf5, print_h5_summary
->>>>>>> b9840b1 (Added h5 summary)
 from collections.abc import Sequence
 
 import warp as wp
@@ -264,15 +256,7 @@ def main():
     )
     env_cfg.observations.policy.concatenate_terms = False
     # create environment
-<<<<<<< HEAD
-<<<<<<< HEAD
     raw_env = gym.make(args_cli.task, cfg=env_cfg)
-=======
-    raw_env = gym.make("Isaac-Lift-Needle-PSM-IK-Abs-v0", cfg=env_cfg)
->>>>>>> 2622ce1 (Save as h5)
-=======
-    raw_env = gym.make(args_cli.task, cfg=env_cfg)
->>>>>>> b9840b1 (Added h5 summary)
 
     # record video
     # raw_env = gym.wrappers.RecordVideo(
@@ -313,19 +297,7 @@ def main():
     drop_log = 0
     drop_cnt = 0
     num_episodes = 3 # set number of episodes
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     target_success = 50 # set number of successful trajs
-=======
-    target_success = 10 # set number of successful trajs
->>>>>>> 2622ce1 (Save as h5)
-=======
-    target_success = 1 # set number of successful trajs
->>>>>>> b9840b1 (Added h5 summary)
-=======
-    target_success = 50 # set number of successful trajs
->>>>>>> 71eec3b (Fixed API)
     episode_saved = False # init bool for saving traj
     # max_steps = num_episodes * episode_length
     
@@ -366,21 +338,11 @@ def main():
                 "episode_id": episode_id,
                 "sm_state": pick_sm.sm_state.detach().cpu(),
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 71eec3b (Fixed API)
                 "obs": {
                     "policy": {
                         k: v.detach().cpu() for k, v in obs_dict["policy"].items()
                     }
                 },
-<<<<<<< HEAD
-=======
-                "obs": obs_dict["policy"].cpu(),
->>>>>>> 2622ce1 (Save as h5)
-=======
->>>>>>> 71eec3b (Fixed API)
                 "action": actions.detach().cpu(),
                 "reward": reward.detach().cpu(),
                 "ee_pos": tcp_rest_position.detach().cpu(),
@@ -392,20 +354,8 @@ def main():
                 "timeout_log": timeout_log,
             })
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
             save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_50_v3.hdf5"
             
-=======
->>>>>>> 2622ce1 (Save as h5)
-=======
-            save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_1.hdf5"
-=======
-            save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_50_v3.hdf5"
->>>>>>> 71eec3b (Fixed API)
-            
->>>>>>> b9840b1 (Added h5 summary)
             if dones.any():
                 success_log = info["log"]["Episode_Termination/object_lifted"]
                 timeout_log = info["log"]["Episode_Termination/time_out"]
@@ -414,16 +364,7 @@ def main():
                 if success_log == 1:
                     success_cnt += 1
                    
-<<<<<<< HEAD
-<<<<<<< HEAD
                     save_demo_to_hdf5(save_path, episode_traj, success_cnt - 1, args_cli.task)
-=======
-                    save_path = f"source/standalone/environments/data/lift_n_trajs_100_v3/lift_n_1_dataset_Abs.hdf5"
-                    save_demo_to_hdf5(save_path, episode_traj, success_cnt - 1)
->>>>>>> 2622ce1 (Save as h5)
-=======
-                    save_demo_to_hdf5(save_path, episode_traj, success_cnt - 1, args_cli.task)
->>>>>>> b9840b1 (Added h5 summary)
                     print(f"Saved demo_{success_cnt - 1}")
                     # episode_saved = True
 
@@ -437,16 +378,8 @@ def main():
                 episode_step = 0
                 episode_id += 1
 
-<<<<<<< HEAD
-<<<<<<< HEAD
                 if success_cnt >= target_success:
                     print_h5_summary(save_path)
-<<<<<<< HEAD
-=======
-                if success_cnt >= target_success:
->>>>>>> 8ddb09e (Save as h5 works)
-=======
->>>>>>> b9840b1 (Added h5 summary)
                     break
 
                 # reset
@@ -457,13 +390,6 @@ def main():
                 actions[:, 3] = 1.0
                 
                 continue
-<<<<<<< HEAD
-=======
-                raw_env.reset()
-                base_env.sim.step()
->>>>>>> 2622ce1 (Save as h5)
-=======
->>>>>>> 8ddb09e (Save as h5 works)
 
             # advance state machine
             actions = pick_sm.compute(
@@ -481,15 +407,7 @@ def main():
                 print("success_cnt: ", success_cnt)
                 print("timeout_cnt: ", timeout_cnt)
                 print("drop_cnt: ", drop_cnt)
-<<<<<<< HEAD
-<<<<<<< HEAD
                 # print("obs_dict_policy: ", obs_dict["policy"])
-=======
-                print("obs_dict_policy: ", obs_dict["policy"])
->>>>>>> 8ddb09e (Save as h5 works)
-=======
-                # print("obs_dict_policy: ", obs_dict["policy"])
->>>>>>> 71eec3b (Fixed API)
                 # print("ee pose input[0]: ", torch.cat([tcp_rest_position_b, tcp_rest_orientation], dim=-1))
                 # print("object pose input[0]: ", torch.cat([object_position_b, object_orientation], dim=-1))
                 # print("desired object pose[0]: ", desired_pose[0])
