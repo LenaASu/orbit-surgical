@@ -1,0 +1,6 @@
+checkpoint,path,episodes,success,timeout,drop,success_rate
+model_800.pt,/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-07-05_23-40-21/model_800.pt,50,41,9,0,82.0
+model_850.pt,/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-07-05_23-40-21/model_850.pt,50,39,11,0,78.0
+model_500.pt,/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-07-05_23-40-21/model_500.pt,50,38,11,1,76.0
+model_700.pt,/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-07-05_23-40-21/model_700.pt,50,38,12,0,76.0
+model_550.pt,/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-07-05_23-40-21/model_550.pt,50,36,14,0,72.0

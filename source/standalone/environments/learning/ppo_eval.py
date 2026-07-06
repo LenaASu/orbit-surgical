@@ -44,7 +44,7 @@ parser.add_argument("--seed", type=int, default=None, help="Seed used for the en
 parser.add_argument(
     "--task", 
     type=str, 
-    default="Isaac-Lift-Needle-PSM-IK-Abs-Play-v0", 
+    default="Isaac-Lift-Needle-PSM-IK-Abs-v0", 
     help="Name of the task."
 )
 <<<<<<< HEAD
@@ -53,10 +53,11 @@ parser.add_argument(
     "--checkpoint_dir",
     type=str,
     # default="/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test",
-    default="/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/",
+    default="/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-07-05_23-40-21",
 )
 
 FILE_PATH = Path(__file__).resolve().parent
+<<<<<<< HEAD
 save_path = FILE_PATH / "results" / "bc_ppo_top5.csv"
 =======
 =======
@@ -81,6 +82,9 @@ parser.add_argument(
 FILE_PATH = Path(__file__).resolve().parent
 save_path = FILE_PATH / "results" / "bc_ppo_top5.csv"
 >>>>>>> 16fef0a (Test bc+ppo)
+=======
+save_path = FILE_PATH / "results" / "bc_ppo_top5_v3.csv"
+>>>>>>> 32de857 (Finished ppo baseline)
 
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
@@ -88,6 +92,7 @@ cli_args.add_rsl_rl_args(parser)
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 
+<<<<<<< HEAD
 if args_cli.checkpoint is None:
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -110,6 +115,12 @@ if args_cli.checkpoint is None:
     args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_00.pt"
     # args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
 >>>>>>> 16fef0a (Test bc+ppo)
+=======
+# if args_cli.checkpoint is None:
+#     # args_cli.checkpoint = "/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
+#     args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-07-05_23-40-21/model_999.pt"
+#     # args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
+>>>>>>> 32de857 (Finished ppo baseline)
 
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
