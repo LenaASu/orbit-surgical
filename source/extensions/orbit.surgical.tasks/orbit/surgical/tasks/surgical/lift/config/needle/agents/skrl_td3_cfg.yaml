@@ -1,0 +1,147 @@
+seed: 42
+
+# Models are instantiated using skrl's model instantiator utility
+# https://skrl.readthedocs.io/en/latest/api/models.html
+models:
+  separate: True
+  policy:  # see skrl.utils.model_instantiators.gaussian_model for parameter details
+    class: DeterministicMixin
+    clip_actions: False
+    # clip_log_std: True
+    # min_log_std: -20.0
+    # max_log_std: 2.0
+    # input_shape: "Shape.STATES"
+    # hiddens: [256, 128, 64]
+    # hidden_activation: ["elu", "elu", "elu"]
+    # output_shape: "Shape.ACTIONS"
+    # output_activation: "tanh"
+    # output_scale: 1.0
+    network:
+      - name: net
+        input: "OBSERVATIONS"
+        layers: [256, 128, 64]
+        activations: elu
+    output: "ACTIONS"
+
+  target_policy:
+    class: DeterministicMixin
+    clip_actions: False
+    # input_shape: "Shape.STATES"
+    # hiddens: [256, 128, 64]
+    # hidden_activation: ["elu", "elu", "elu"]
+    # output_shape: "Shape.ACTIONS"
+    # output_activation: "tanh"
+    # output_scale: 1.0
+    network:
+    - name: net
+      input: "OBSERVATIONS"
+      layers: [256, 128, 64]
+      activations: elu
+    output: "ACTIONS"
+
+  critic_1:
+    class: DeterministicMixin
+    clip_actions: False
+    # input_shape: "Shape.STATES_ACTIONS"
+    # hiddens: [256, 128, 64]
+    # hidden_activation: ["elu", "elu", "elu"]
+    # output_shape: "Shape.ONE"
+    # output_activation: ""
+    # output_scale: 1.0
+    network:
+    - name: net
+      input: "concatenate((OBSERVATIONS, ACTIONS))"
+      layers: [256, 128, 64]
+      activations: elu
+    output: "ONE"
+
+  critic_2:
+    class: DeterministicMixin
+    clip_actions: False
+    # input_shape: "Shape.STATES_ACTIONS"
+    # hiddens: [256, 128, 64]
+    # hidden_activation: ["elu", "elu", "elu"]
+    # output_shape: "Shape.ONE"
+    # output_activation: ""
+    # output_scale: 1.0
+    network:
+    - name: net
+      input: "concatenate((OBSERVATIONS, ACTIONS))"
+      layers: [256, 128, 64]
+      activations: elu
+    output: "ONE"
+
+  target_critic_1:
+    class: DeterministicMixin
+    clip_actions: False
+    # input_shape: "Shape.STATES_ACTIONS"
+    # hiddens: [256, 128, 64]
+    # hidden_activation: ["elu", "elu", "elu"]
+    # output_shape: "Shape.ONE"
+    # output_activation: ""
+    # output_scale: 1.0
+    network:
+    - name: net
+      input: "concatenate((OBSERVATIONS, ACTIONS))"
+      layers: [256, 128, 64]
+      activations: elu
+    output: "ONE"
+
+  target_critic_2:
+    class: DeterministicMixin
+    clip_actions: False
+    # input_shape: "Shape.STATES_ACTIONS"
+    # hiddens: [256, 128, 64]
+    # hidden_activation: ["elu", "elu", "elu"]
+    # output_shape: "Shape.ONE"
+    # output_activation: ""
+    # output_scale: 1.0
+    network:
+    - name: net
+      input: "concatenate((OBSERVATIONS, ACTIONS))"
+      layers: [256, 128, 64]
+      activations: elu
+    output: "ONE"
+
+memory:
+  class: RandomMemory
+  memory_size: 10000
+
+# TD3 agent configuration 
+# https://skrl.readthedocs.io/en/latest/api/agents/td3.html
+agent:
+  gradient_steps: 1
+  batch_size: 256
+  discount_factor: 0.99
+  polyak: 0.005
+  class: TD3
+  learning_rate: [1.e-4, 1.e-3]
+  random_timesteps: 1000
+  learning_starts: 1000
+  policy_delay: 2
+  exploration_noise: GaussianNoise
+  exploration_noise_kwargs:
+    mean: 0.0
+    std: 0.1
+  smooth_regularization_noise: GaussianNoise
+  smooth_regularization_noise_kwargs:
+    mean: 0.0
+    std: 0.2
+  smooth_regularization_clip: 0.5
+  observation_preprocessor: "RunningStandardScaler"
+  observation_preprocessor_kwargs: null
+  # rewards_shaper_scale: 0.01
+
+  # logging and checkpoint
+  experiment:
+    directory: "lift"
+    experiment_name: ""
+    write_interval: 120
+    checkpoint_interval: 1200
+
+
+# Sequential trainer
+# https://skrl.readthedocs.io/en/latest/modules/skrl.trainers.sequential.html
+trainer:
+  class: SequentialTrainer
+  timesteps: 24000
