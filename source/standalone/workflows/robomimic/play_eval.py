@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser(description="Play policy trained using robomimi
 parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
-parser.add_argument("--task", type=str, default=None, help="Name of the task.")
+parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0", help="Name of the task.")
 parser.add_argument("--checkpoint", type=str, default=None, help="Pytorch model checkpoint to load.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)

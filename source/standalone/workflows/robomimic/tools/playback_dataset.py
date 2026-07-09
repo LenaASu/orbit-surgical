@@ -3,11 +3,11 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Script to run a trained policy from robomimic."""
+"""Script to run a hdf5 dataset from robomimic."""
 
 """Launch Isaac Sim Simulator first."""
 
-import argparse
+import argparse,h5py
 
 from isaaclab.app import AppLauncher
 
@@ -17,7 +17,7 @@ parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
 parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0", help="Name of the task.")
-parser.add_argument("--checkpoint", type=str, default="/home/lena/Documents/GitHub/orbit-surgical/logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/test/20260708144530/models/model_epoch_200.pth", help="Pytorch model checkpoint to load.")
+parser.add_argument("--checkpoint", type=str, default=None, help="PHdf5 checkpoint to load.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
@@ -56,23 +56,45 @@ def main():
     # acquire device
     device = TorchUtils.get_torch_device(try_to_use_cuda=True)
     # restore policy
-    policy, _ = FileUtils.policy_from_checkpoint(ckpt_path=args_cli.checkpoint, device=device, verbose=True)
+    # policy, _ = FileUtils.policy_from_checkpoint(ckpt_path=args_cli.checkpoint, device=device, verbose=True)
 
-    # reset environment
+    # HDF5
+    with h5py.File(args_cli.checkpoint, "r") as f:
+        demo = f["data"]["demo_0000"]
+        actions = demo["actions"][:]
+
     obs_dict, _ = env.reset()
-    # robomimic only cares about policy observations
-    obs = obs_dict["policy"]
-    # simulate environment
-    while simulation_app.is_running():
-        # run everything in inference mode
-        with torch.inference_mode():
-            # compute actions
-            actions = policy(obs)
-            actions = torch.from_numpy(actions).to(device=device).view(1, env.action_space.shape[1])
-            # apply actions
-            obs_dict = env.step(actions)[0]
-            # robomimic only cares about policy observations
-            obs = obs_dict["policy"]
+    done_reason = "not_done"
+
+    for i, a in enumerate(actions):
+        action = torch.tensor(a, device=env.unwrapped.device, dtype=torch.float32).view(1, -1)
+        obs_dict, reward, terminated, truncated, info = env.step(action)
+
+        success = info["log"]["Episode_Termination/object_lifted"]
+        timeout = info["log"]["Episode_Termination/time_out"]
+        drop = info["log"]["Episode_Termination/object_dropping"]
+
+        print(
+            f"step={i:04d} | "
+            f"success={success} timeout={timeout} drop={drop} | "
+            f"terminated={terminated[0]} truncated={truncated[0]} | "
+            f"reward={reward[0].item():.6f}"
+        )
+
+        if success:
+            done_reason = "success"
+            break
+        elif drop:
+            done_reason = "drop"
+            break
+        elif timeout:
+            done_reason = "timeout"
+            break
+        elif terminated or truncated:
+            done_reason = "done"
+            break
+
+    print(f"\nReplay finished: {done_reason}, last_step={i}, num_actions={len(actions)}")
 
     # close the simulator
     env.close()
