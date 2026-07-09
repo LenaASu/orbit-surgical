@@ -119,20 +119,17 @@ def train(config, device):
     
     # Add filter keys
     config.unlock()
-    config.train.data = dataset_path
+    # config.train.data = dataset_path
     config.train.hdf5_filter_key = train_filter
     config.train.hdf5_validation_filter_key = valid_filter
     config.lock()
 
     # load basic metadata from training file
     print("\n============= Loaded Environment Metadata =============")
+    # help(FileUtils.get_shape_metadata_from_dataset)
+    # print("dataset_path:", dataset_path)
     env_meta = FileUtils.get_env_metadata_from_dataset(dataset_path=dataset_path)
-    shape_meta = FileUtils.get_shape_metadata_from_dataset(
-        dataset_path=dataset_path, 
-        # action_keys=None, 
-        all_obs_keys=config.all_obs_keys,
-        verbose=True
-    )
+    shape_meta = FileUtils.get_shape_metadata_from_dataset(dataset_config=config.train.data[0], action_keys=config.train.action_keys, all_obs_keys=config.all_obs_keys, verbose=True)
 
     if config.experiment.env is not None:
         env_meta["env_name"] = config.experiment.env
@@ -162,7 +159,7 @@ def train(config, device):
     print("")
 
     # setup for a new training run
-    data_logger = DataLogger(log_dir, config=config, log_tb=config.experiment.logging.log_tb)
+    data_logger = DataLogger(log_dir, config=config, log_tb=config.experiment.logging.log_tb, log_wandb=config.experiment.logging.log_wandb)
     model = algo_factory(
         algo_name=config.algo_name,
         config=config,
