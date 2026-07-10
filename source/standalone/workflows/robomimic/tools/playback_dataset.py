@@ -17,7 +17,7 @@ parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
 parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0", help="Name of the task.")
-parser.add_argument("--checkpoint", type=str, default=None, help="PHdf5 checkpoint to load.")
+parser.add_argument("--checkpoint", type=str, default="source/standalone/environments/data/datasets/lift_n_dataset_Abs_100.hdf5", help="Hdf5 checkpoint to load.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
@@ -69,16 +69,22 @@ def main():
     for i, a in enumerate(actions):
         action = torch.tensor(a, device=env.unwrapped.device, dtype=torch.float32).view(1, -1)
         obs_dict, reward, terminated, truncated, info = env.step(action)
-
+        # print("info", info)
+        # print("env.unwrapped.termination_manager:", env.unwrapped.termination_manager)
+        # print("env.unwrapped.scene.keys():", env.unwrapped.scene.keys())
         success = info["log"]["Episode_Termination/object_lifted"]
         timeout = info["log"]["Episode_Termination/time_out"]
         drop = info["log"]["Episode_Termination/object_dropping"]
 
+      
+        needle_z = env.unwrapped.scene["object"].data.root_pos_w[0, 2].item()
+
         print(
-            f"step={i:04d} | "
-            f"success={success} timeout={timeout} drop={drop} | "
-            f"terminated={terminated[0]} truncated={truncated[0]} | "
-            f"reward={reward[0].item():.6f}"
+            f"step={i:04d} "
+            f"needle_z={needle_z:.5f} "
+            f"success={success} "
+            f"terminated={terminated} "
+            f"truncated={truncated}"
         )
 
         if success:

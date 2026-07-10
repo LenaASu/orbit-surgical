@@ -431,7 +431,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dataset",
         type=str,
-        default="/home/lena/Documents/GitHub/orbit-surgical/source/standalone/environments/data/datasets/lift_n_dataset_Abs_100.hdf5",
+        default="source/standalone/environments/data/datasets/lift_n_dataset_Abs_100.hdf5",
         help="(optional) if provided, override the dataset path defined in the config",
     )
 

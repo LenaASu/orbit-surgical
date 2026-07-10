@@ -10,6 +10,7 @@
 import argparse,h5py
 
 from isaaclab.app import AppLauncher
+from pathlib import Path
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Play policy trained using robomimic for Isaac Lab environments.")
@@ -17,7 +18,11 @@ parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
 parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0", help="Name of the task.")
-parser.add_argument("--checkpoint", type=str, default=None, help="Pytorch model checkpoint to load.")
+parser.add_argument("--checkpoint_dir", type=str, default="logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/bc/20260704/models", help="Pytorch model checkpoint to load.")
+
+FILE_PATH = Path(__file__).resolve().parent
+save_path = FILE_PATH / "results" / "bc_top5.csv"
+
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
@@ -55,8 +60,13 @@ def main():
 
     # acquire device
     device = TorchUtils.get_torch_device(try_to_use_cuda=True)
-    # restore policy
-    policy, _ = FileUtils.policy_from_checkpoint(ckpt_path=args_cli.checkpoint, device=device, verbose=True)
+    checkpoint_files = sorted(Path(args_cli.checkpoint_dir).glob("model_epoch_*.pth"), key=lambda p: int(p.stem.split("_")[2]))
+    # checkpoint_files = [p for p in checkpoint_files if int(p.stem.split("_")[1]) >= 200]
+    # results = []
+
+    for checkpoint_path in checkpoint_files:
+        # restore policy
+        policy, _ = FileUtils.policy_from_checkpoint(ckpt_path=checkpoint_path, device=device, verbose=True)
 
     # HDF5
     # with h5py.File(args_cli.checkpoint, "r") as f:
@@ -82,7 +92,7 @@ def main():
 
     # BC eval
     # reset environment
-    obs_dict, _ = env.reset()
+    # obs_dict, _ = env.reset()
 
     step = 0
     episode_step = 0

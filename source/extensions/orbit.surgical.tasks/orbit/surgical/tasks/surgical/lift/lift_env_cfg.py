@@ -36,7 +36,8 @@ def object_lifted(
     object = env.scene["object"]
     current_z = object.data.root_pos_w[:, 2]
     initial_z = object.data.default_root_state[:, 2]
-    return (current_z - initial_z) > threshold
+    # return (current_z - initial_z) > threshold
+    return current_z > threshold + 0.013
 
 
 @configclass
@@ -89,12 +90,12 @@ class CommandsCfg:
         resampling_time_range=(1.0, 1.0),
         debug_vis=False,
         ranges=mdp.UniformPoseCommandCfg.Ranges(
-            # pos_x=(-0.05, 0.05),
-            # pos_y=(-0.05, 0.05),
-            # pos_z=(-0.12, -0.12),
-            pos_x=(0, 0),
-            pos_y=(0, 0),
-            pos_z=(0, 0),
+            pos_x=(-0.05, 0.05),
+            pos_y=(-0.05, 0.05),
+            pos_z=(-0.12, -0.12),
+            # pos_x=(0, 0),
+            # pos_y=(0, 0),
+            # pos_z=(0, 0),
             roll=(0.0, 0.0),
             pitch=(0.0, 0.0),
             yaw=(0.0, 0.0),
@@ -147,10 +148,10 @@ class EventCfg:
         mode="reset",
         params={
             "pose_range": {
-                # "x": (-0.03, 0.03), 
-                # "y": (-0.03, 0.03), 
-                "x": (-0.022, -0.022), 
-                "y": (0.0008, 0.0008), 
+                "x": (-0.03, 0.03), 
+                "y": (-0.03, 0.03), 
+                # "x": (-0.022, -0.022), 
+                # "y": (0.0008, 0.0008), 
                 "z": (0.00, 0.00)
                 },
             "velocity_range": {
