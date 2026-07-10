@@ -26,7 +26,7 @@ parser = argparse.ArgumentParser(description="Pick and lift state machine for li
 parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
-parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
+parser.add_argument("--num_envs", type=int, default=128, help="Number of environments to simulate.")
 parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0", help="Name of the task.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -118,7 +118,7 @@ def infer_state_machine(
         gripper_state[tid] = GripperState.OPEN
         # TODO: error between current and desired ee pose below threshold
         # wait for a while
-        if sm_wait_time[tid] >= PickSmWaitTime.APPROACH_OBJECT:
+        if sm_wait_time[tid] >= PickSmWaitTime.APPROACH_ABOVE_OBJECT:
             # move to next state and reset wait time
             sm_state[tid] = PickSmState.APPROACH_OBJECT
             sm_wait_time[tid] = 0.0
@@ -270,13 +270,7 @@ def main():
     raw_env.reset()
     base_env.sim.step()
 
-    # create action buffers (position + quaternion)
-    # actions = torch.zeros(env.unwrapped.action_space.shape, device=env.unwrapped.device)
-    # actions[:, 3] = 1.0
-
-    # # create state machine
-    # pick_sm = PickAndLiftSm(env_cfg.sim.dt * env_cfg.decimation, env.unwrapped.num_envs, env.unwrapped.device)
-
+    # COmpute actions
     actions = torch.zeros(base_env.action_space.shape, device=base_env.device)
     actions[:, 3] = 1.0
 
@@ -286,9 +280,7 @@ def main():
     episode_traj = []
     episode_id = 1
     episode_step = 0
-    # episode_length = env_cfg.episode_length_s / (env_cfg.sim.dt * env_cfg.decimation)
-    episode_length = base_env.max_episode_length
-    
+
     step_cnt = 0
     success_log = 0
     success_cnt = 0
@@ -297,19 +289,16 @@ def main():
     drop_log = 0
     drop_cnt = 0
     num_episodes = 3 # set number of episodes
-    target_success = 50 # set number of successful trajs
+    target_success = 10 # set number of successful trajs
     episode_saved = False # init bool for saving traj
     # max_steps = num_episodes * episode_length
     
+    obs_dict, reward, terminated, truncated, info = raw_env.step(actions)
+    base_env.sim.step()
+
     while simulation_app.is_running():
         # run everything in inference mode
         with torch.inference_mode():
-            # executed_actions = actions.clone()
-
-            # step environment
-            obs_dict, reward, terminated, truncated, info = raw_env.step(actions)
-            dones = terminated | truncated
-
             # observations
             robot: RigidObject = base_env.scene["robot"]
             # -- end-effector frame
@@ -330,14 +319,18 @@ def main():
             # desired_pose = env.unwrapped.command_manager.get_command("object_pose")
             desired_pose = base_env.command_manager.get_command("object_pose")
 
-
+            # compute action
+            actions = pick_sm.compute(
+                torch.cat([tcp_rest_position_b, tcp_rest_orientation], dim=-1), 
+                torch.cat([object_position_b, object_orientation], dim=-1), 
+                desired_pose
+                )
             # Add traj
             # if step_cnt % 5 == 0:
             episode_traj.append({
                 "step": step_cnt,
                 "episode_id": episode_id,
                 "sm_state": pick_sm.sm_state.detach().cpu(),
-
                 "obs": {
                     "policy": {
                         k: v.detach().cpu() for k, v in obs_dict["policy"].items()
@@ -354,8 +347,11 @@ def main():
                 "timeout_log": timeout_log,
             })
 
-            save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_50_v3.hdf5"
+            save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_50_v2.hdf5"
             
+            next_obs_dict, reward, terminated, truncated, info = raw_env.step(actions)
+            dones = terminated | truncated
+
             if dones.any():
                 success_log = info["log"]["Episode_Termination/object_lifted"]
                 timeout_log = info["log"]["Episode_Termination/time_out"]
@@ -378,26 +374,29 @@ def main():
                 episode_step = 0
                 episode_id += 1
 
+                # reset
+                # raw_env.reset()
+                # base_env.sim.step()
+                pick_sm.reset_idx()
+                obs_dict = next_obs_dict
+
                 if success_cnt >= target_success:
                     print_h5_summary(save_path)
                     break
 
-                # reset
-                raw_env.reset()
-                base_env.sim.step()
-                pick_sm.reset_idx()
-                actions = torch.zeros(base_env.action_space.shape, device=base_env.device)
-                actions[:, 3] = 1.0
+                # actions = torch.zeros(base_env.action_space.shape, device=base_env.device)
+                # actions[:, 3] = 1.0
                 
                 continue
 
-            # advance state machine
-            actions = pick_sm.compute(
-                torch.cat([tcp_rest_position_b, tcp_rest_orientation], dim=-1),
-                torch.cat([object_position_b, object_orientation], dim=-1),
-                desired_pose,
+            # # advance state machine
+            # actions = pick_sm.compute(
+            #     torch.cat([tcp_rest_position_b, tcp_rest_orientation], dim=-1),
+            #     torch.cat([object_position_b, object_orientation], dim=-1),
+            #     desired_pose,
                 
-            )
+            # )
+            obs_dict = next_obs_dict
             step_cnt += 1
             episode_step += 1
 
@@ -418,8 +417,8 @@ def main():
                 # print("object_z: ", object_position_b[0, 2])
                 # print("ee_z: ", tcp_rest_position_b[0, 2])
                 # print("success: ", success)
-                print("terminated: ", terminated)
-                print("truncated: ", truncated)
+                # print("terminated: ", terminated)
+                # print("truncated: ", truncated)
                 # print(info)
 
            

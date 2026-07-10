@@ -97,49 +97,50 @@ def eval_checkpoint(env, checkpoint_path):
     total_rewards = []
     episode_lengths = []
 
-    while simulation_app.is_running():
+    while simulation_app.is_running() and episode_id <= num_episodes:
         with torch.inference_mode():
             obs = convert_obs(obs_dict)
             
             action_np = policy(ob=obs)
             action = torch.as_tensor(action_np, device=env.unwrapped.device, dtype=torch.float32).reshape(1, -1)
-            obs_dict, reward, terminated, truncated, info = env.step(action)
-            # print("info", info)
-            # print("env.unwrapped.termination_manager:", env.unwrapped.termination_manager)
-            # print("env.unwrapped.scene.keys():", env.unwrapped.scene.keys())
+        obs_dict, reward, terminated, truncated, info = env.step(action)
+        # print("info", info)
+        # print("env.unwrapped.termination_manager:", env.unwrapped.termination_manager)
+        # print("env.unwrapped.scene.keys():", env.unwrapped.scene.keys())
+        
+        step_cnt += 1
+        episode_step += 1
+        episode_reward += reward[0].item()
+        
+        if step_cnt % 100 == 0:
+            print(f"Running: step={step_cnt}, episode={episode_id}")
             
-            step_cnt += 1
-            episode_step += 1
-            episode_reward += reward[0].item()
+        if terminated | truncated:
+            success_log = info["log"]["Episode_Termination/object_lifted"]
+            timeout_log = info["log"]["Episode_Termination/time_out"]
+            drop_log = info["log"]["Episode_Termination/object_dropping"]
+
+            if success_log == 1:
+                success_cnt += 1
+                success_steps.append(episode_step)
+                
+            if timeout_log == 1:
+                timeout_cnt += 1
+
+            if drop_log == 1:
+                drop_cnt += 1
             
-            if step_cnt % 100 == 0:
-                print(f"Running: step={step_cnt}, episode={episode_id}")
-                
-            if terminated or truncated or episode_id > num_episodes:
-                success_log = info["log"]["Episode_Termination/object_lifted"]
-                timeout_log = info["log"]["Episode_Termination/time_out"]
-                drop_log = info["log"]["Episode_Termination/object_dropping"]
-
-                if success_log == 1:
-                    success_cnt += 1
-                    success_steps.append(episode_step)
-                    
-                if timeout_log == 1:
-                    timeout_cnt += 1
-
-                if drop_log == 1:
-                    drop_cnt += 1
-                
-                total_rewards.append(episode_reward)
-                episode_lengths.append(episode_step)
-                # reset
-                
-                episode_step = 0
-                episode_reward = 0.0
-                # print(info)
-                # print("success:", success_cnt)
-                # print("timeout: ", timeout_cnt)
-                episode_id += 1
+            total_rewards.append(episode_reward)
+            episode_lengths.append(episode_step)
+            
+            # reset
+            episode_step = 0
+            episode_reward = 0.0
+            # print(info)
+            # print("success:", success_cnt)
+            # print("timeout: ", timeout_cnt)
+            episode_id += 1
+            obs_dict, _ = env.reset()
 
     return {
         "checkpoint": checkpoint_path.name,
@@ -183,9 +184,9 @@ def main():
 
         print(f"{result['checkpoint']}:")
         print(f"success {result['success']}/{result['episodes']}")
-        print(f"{result['success_rate']:.1f}%")
-        print(f"timeout {result['timeout']}")
-        print(f"drop {result['drop']}")
+        print(f"success_rate {result['success_rate']:.1f}%")
+        print(f"timeout {result['timeout']}/{result['episodes']}")
+        print(f"drop {result['drop']}/{result['episodes']}")
 
     results = sorted(results, key=lambda x:x["success_rate"], reverse=True)
 
