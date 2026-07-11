@@ -21,7 +21,7 @@ parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0
 parser.add_argument(
     "--checkpoint_dir",
     type=str,
-    default="logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/bc/20260704/models",
+    default="logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/bc/20260710133703/models",
     help="Directory contains model_epoch_*.pth checkpoints."
 )
 parser.add_argument("--num_episodes", type=str, default=50, help="Episodes playing for evaluation.")
@@ -71,7 +71,7 @@ def convert_obs(obs_dict):
 
 def eval_checkpoint(env, checkpoint_path):
     """Play with robomimic agent and print results summary."""
-    print(f"[INFO]: Loading model checkpoint from: {checkpoint_path}")
+    print(f"Loading model checkpoint from: {checkpoint_path}")
 
     # acquire device
     device = TorchUtils.get_torch_device(try_to_use_cuda=True)
@@ -199,17 +199,17 @@ def main():
             f"success_rate={r['success_rate']:.1f}% "
             f"success={r['success']}/{r['episodes']} "
             f"timeout={r['timeout']} "
-            f"drop={r['drop']}"
-            f"mean_reward={r['mean_rewards']}"
-            f"mean_success_step={r['mean_success_steps']}"
-            f"mean_episode_length={r['mean_episode_length']}"
+            f"drop={r['drop']} "
+            f"mean_reward={r['mean_rewards']} "
+            f"mean_success_step={r['mean_success_steps']} "
+            f"mean_episode_length={r['mean_episode_length']} "
         )
     print("=" * 70)
 
     save_path.parent.mkdir(parents=True, exist_ok=True)
     df = pd.DataFrame(results[:5])
     df.to_csv(save_path, index=False)
-    print(f"[INFO] Saved results to {save_path}.")
+    print(f"Saved results to {save_path}.")
     
     # close the simulator
     env.close()

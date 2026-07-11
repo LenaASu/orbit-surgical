@@ -4,16 +4,15 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 
-def save_demo_to_hdf5(h5_path, episode_traj, demo_id, task, env_id=0):
+def save_demo_to_hdf5(h5_path, episode_traj, demo_id, task):
     if len(episode_traj) == 0:
         return
     
     h5_path = Path(h5_path)
     h5_path.parent.mkdir(parents=True, exist_ok=True)
 
-   
-    action_f = torch.stack([x["action"][env_id] for x in episode_traj], dim=0).numpy()
-    reward_f = torch.stack([x["reward"][env_id] for x in episode_traj], dim=0).numpy()
+    action_f = torch.stack([x["action"] for x in episode_traj], dim=0).numpy()
+    reward_f = torch.stack([x["reward"] for x in episode_traj], dim=0).numpy()
     # dones_f = torch.cat([x["terminated"] | x["truncated"] for x in episode_traj], dim=0).numpy()
 
     dones = torch.zeros(len(episode_traj), dtype=torch.bool)
@@ -34,7 +33,7 @@ def save_demo_to_hdf5(h5_path, episode_traj, demo_id, task, env_id=0):
         obs_keys = episode_traj[0]["obs"]["policy"].keys()
         # obs_group.create_dataset("policy", data=obs_f, compression="gzip")
         for key in obs_keys:
-            obs_f = torch.stack([x["obs"]["policy"][key][env_id] for x in episode_traj], dim=0).cpu().numpy()
+            obs_f = torch.stack([x["obs"]["policy"][key] for x in episode_traj], dim=0).cpu().numpy()
             obs_group.create_dataset(key, data=obs_f, compression="gzip")
             obs_dim += obs_f.shape[-1]
 
@@ -81,7 +80,6 @@ def print_h5_summary(h5_path):
         num_demos = len(lengths)
         total_samples = sum(lengths)
 
-        
         print("\n" + "=" * 60)
         print("Dataset Summary")
         print("=" * 60)
@@ -98,14 +96,3 @@ def print_h5_summary(h5_path):
         print(f"Collector           : {data.attrs['collector']}")
         print(f"Environment         : {json.loads(data.attrs['env_args'])['env_name']}")
         print("=" * 60)
-
-'''
-Sample usage:
-
-h5_path = "source/standalone/environments/data/datasets/lift_n_dataset_Abs_50.hdf5"
-analyze_h5(h5_path, save_path=None)
-
-with h5py.File(h5_path, "r") as f:
-    print_h5_summary(f)
-
-'''

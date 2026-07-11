@@ -103,7 +103,7 @@ def split_train_val_from_hdf5(hdf5_path: str, val_ratio=0.1, filter_key=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("dataset", type=str, help="path to hdf5 dataset")
+    parser.add_argument("--dataset", type=str, help="path to hdf5 dataset")
     parser.add_argument(
         "--filter_key",
         type=str,
