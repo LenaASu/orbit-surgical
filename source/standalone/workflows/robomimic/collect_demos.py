@@ -11,7 +11,7 @@ It uses the `warp` library to run the state machine in parallel on the GPU.
 
 .. code-block:: bash
 
-    ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/state_machine/lift_needle_sm.py --num_envs 1
+    ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/robomimic/collect_domos.py --num_envs 1
 
 """
 
@@ -28,7 +28,8 @@ parser.add_argument(
 )
 parser.add_argument("--num_envs", type=int, default=1, help="Number of environments to simulate.")
 parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0", help="Name of the task.")
-parser.add_argument("--num_episodes", type=int, default=50, help="Number of episodes to simulate.")
+parser.add_argument("--target_success", type=int, default=200, help="The number of collected demonstrations.")
+save_path = f"source/standalone/workflows/robomimic/data/datasets/lift_n_dataset_Abs_test.hdf5"
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -44,6 +45,7 @@ simulation_app = app_launcher.app
 
 import gymnasium as gym
 import torch
+from source.standalone.workflows.robomimic.collect_helper import save_demo_to_hdf5, print_h5_summary
 from collections.abc import Sequence
 
 import warp as wp
@@ -258,9 +260,17 @@ def main():
     env_cfg.observations.policy.concatenate_terms = False
     # create environment
     raw_env = gym.make(args_cli.task, cfg=env_cfg)
+
+    # record video
+    # raw_env = gym.wrappers.RecordVideo(
+    #     raw_env,
+    #     video_folder="./videos",
+    #     episode_trigger=lambda episode_id:True
+    #     )
     
     base_env = raw_env.unwrapped
     # reset environment at start
+    # raw_env.reset()
     obs_dict, info = raw_env.reset()
     base_env.sim.step()
 
@@ -270,13 +280,24 @@ def main():
 
     pick_sm = PickAndLiftSm(env_cfg.sim.dt * env_cfg.decimation, base_env.num_envs, base_env.device)
 
-    step_cnt = 0
-    success_cnt = 0
-    timeout_cnt = 0
-    drop_cnt = 0
+    # Create traj set
+    episode_traj = []
     episode_id = 1
+    episode_step = 0
 
-    while simulation_app.is_running() and episode_id <= args_cli.num_episodes:
+    step_cnt = 0
+    success_log = 0
+    success_cnt = 0
+    timeout_log = 0
+    timeout_cnt = 0
+    drop_log = 0
+    drop_cnt = 0
+    target_success = args_cli.target_success 
+
+    # obs_dict, reward, terminated, truncated, info = raw_env.step(actions)
+    # base_env.sim.step()
+
+    while simulation_app.is_running() and success_cnt < target_success:
         # run everything in inference mode
         with torch.inference_mode():
             # observations
@@ -304,11 +325,39 @@ def main():
                 torch.cat([object_position_b, object_orientation], dim=-1), 
                 desired_pose
                 )
+            
+            # Add traj
+            episode_traj.append(
+                {
+                    "step": episode_step,
+                    "episode_id": episode_id,
+                    "sm_state": pick_sm.sm_state[0].detach().cpu().clone(),
+                    "obs": {
+                        "policy": {
+                            key: value[0].detach().cpu().clone()
+                            for key, value in obs_dict["policy"].items()
+                        }
+                    },
+                    "action": actions[0].detach().cpu().clone(),
+                    "ee_pos": tcp_rest_position[0].detach().cpu().clone(),
+                    "object_pos": object_position[0].detach().cpu().clone(),
+                }
+            )
 
             next_obs_dict, reward, terminated, truncated, info = raw_env.step(actions)
             dones = terminated | truncated
+            
+            # Append results
+            episode_traj[-1].update(
+                {
+                    "reward": reward[0].detach().cpu().clone(),
+                    "terminated": terminated[0].detach().cpu().clone(),
+                    "truncated": truncated[0].detach().cpu().clone(),
+                }
+            )
 
             step_cnt += 1
+            episode_step += 1
             obs_dict = next_obs_dict
 
             # Check termination and save trajs
@@ -319,6 +368,9 @@ def main():
 
                 if success_log == 1:
                     success_cnt += 1
+                    demo_id = success_cnt - 1
+                    save_demo_to_hdf5(save_path, episode_traj, demo_id, args_cli.task)
+                    print(f"Saved demo_{success_cnt - 1}")
 
                 if timeout_log == 1:
                     timeout_cnt += 1
@@ -327,9 +379,14 @@ def main():
                     drop_cnt += 1
 
                 # reset
+                # raw_env.reset()
+                # base_env.sim.step()
+                episode_traj = []
+                episode_step = 0
                 episode_id += 1
                 pick_sm.reset_idx()
-               
+                # obs_dict = next_obs_dict
+
             if step_cnt % 10 == 0:
                 print("step: ", step_cnt)
                 print("episode: ", episode_id)
@@ -337,18 +394,10 @@ def main():
                 print("timeout_cnt: ", timeout_cnt)
                 print("drop_cnt: ", drop_cnt)
                 print("sm_state: ", pick_sm.sm_state[0].item())
-        
-    success_rate = 100.0 * success_cnt / (episode_id - 1)
-
-    print("\n" + "=" * 60)
-    print("State Machine Evaluation")
-    print("=" * 60)
-    print(f"Episodes       : {args_cli.num_episodes}")
-    print(f"Success        : {success_cnt}")
-    print(f"Timeout        : {timeout_cnt}")
-    print(f"Drop           : {drop_cnt}")
-    print(f"Success Rate   : {success_rate:.1f}%")
-    print("=" * 60)
+    
+    # Print traj summary
+    if success_cnt >= target_success:
+        print_h5_summary(save_path)
 
     # close the environment
     raw_env.close()
