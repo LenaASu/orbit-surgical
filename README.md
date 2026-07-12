@@ -41,9 +41,9 @@ git clone https://github.com/LenaASu/orbit-surgical.git
 
 ### Repository Structure
 
-- **state_machine/** – state-machine benchmark and demonstration collection
+- **state_machine/** – state machine benchmark 
 - **data/** – demonstration datasets in HDF5 format
-- **robomimic/** – BC training, visualization and evaluation
+- **robomimic/** – BC demonstration collection, training, visualization and evaluation
 - **rsl_rl/** – PPO training and evaluation
 - **skrl/** – TD3 training and evaluation
 - **media/** – figures and benchmark videos
@@ -76,7 +76,7 @@ The demonstrations are automatically converted into a RoboMimic-compatible HDF5 
 1. Collect demonstrations with state machine for the environment `Isaac-Lift-Needle-PSM-IK-Abs-v0`:
 
 ```bash
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/state_machine/lift_needle_sm.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 1 
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/robomimic/collect_demos.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 1 
 ```
 
 2. Split the dataset into train and validation set: 
@@ -107,13 +107,13 @@ ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/robomimic/eval.py --
 ## Reinforcement Learning
 ### PPO
 
-Train an agent on `Isaac-Lift-Needle-PSM-IK-Abs-v0` with [RSL-RL](https://github.com/leggedrobotics/rsl_rl):
+Train an agent on `Isaac-Lift-Needle-PSM-IK-Abs-v0`:
 
 ```bash
 # run script for training
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/ppo.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --headless
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/rsl_rl/train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --headless
 # run script for playing with 32 environments
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/ppo.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 32 
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/rsl_rl/train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 32 
 ```
 
 ### TD3
