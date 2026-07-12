@@ -8,20 +8,21 @@
 
 ## Overview
 
-This project extends the ORBIT-Surgical framework with a complete robot learning pipeline for surgical needle manipulation.
-
-The implemented pipeline includes state-machine benchmarking, demonstration collection, imitation learning, reinforcement learning, hybrid BC+PPO training, and automatic policy evaluation on the Lift Needle task.
+This repository extends the ORBIT-Surgical framework with a complete learning pipeline for surgical needle manipulation in Isaac Lab. The pipeline includes a state-machine baseline, automatic demonstration collection, imitation learning with RoboMimic, reinforcement learning with RSL-RL, and automatic checkpoint evaluation on the Lift Needle benchmark.
 
 ### Highlights
 
-- State machine surgical needle benchmark
-- Automatic demonstration collection
-- Trajectory collection, export and visualization
-- Behavior Cloning (BC) 
-- PPO
-- BC + PPO
-- Automatic policy checkpoint evaluation
-- Algorithm comparison
+- State machine benchmark for surgical needle manipulation
+- Automatic HDF5 demonstration dataset generation 
+- RoboMimic Behavior Cloning (BC)
+- RSL-RL Proximal Policy Optimization (PPO)
+- Skrl Twin-Delayed Deep Deterministic (TD3)
+- Automatic checkpoint evaluation
+- Policy performance comparison
+
+### Pipeline
+
+
 
 ## Setup
 
@@ -38,6 +39,15 @@ Clone this repository to a directory **outside** the Isaac Lab installation dire
 git clone https://github.com/LenaASu/orbit-surgical.git
 ```
 
+### Repository Structure
+
+- **state_machine/** – state-machine benchmark and demonstration collection
+- **data/** – demonstration datasets in HDF5 format
+- **robomimic/** – BC training, visualization and evaluation
+- **rsl_rl/** – PPO training and evaluation
+- **skrl/** – TD3 training and evaluation
+- **media/** – figures and benchmark videos
+
 ## Benchmark (State Machine)
 
 <p align="center">
@@ -49,26 +59,18 @@ The state machine baseline successfully grasps and lifts a suture needle and is 
 ### Benchmark Video
 https://github.com/user-attachments/assets/07509bdc-0bed-4780-8f30-1dbccac22174
 
-## Dataset Statistics
-
-- Successful demonstrations: 100
-- Observation dimension: 34
-- Action dimension: 8
-- Mean trajectory length: 196.62 steps
-- Environment: Isaac-Lift-Needle-PSM-IK-Abs
-
-The dataset consists of 100 successful state-machine demonstrations collected on the Lift Needle task in `.pt` format.
-
-Each trajectory stores:
-
-- observations (34D)
-- actions (8D)
-- rewards
-- episode information
-- end-effector pose
-- object pose
-
 ## Imitation Learning
+### Dataset
+The demonstrations are automatically converted into a RoboMimic-compatible HDF5 dataset for offline imitation learning.
+
+| Item | Value |
+|------|------|
+| Demonstrations | 200 |
+| Observation dimension | 34 |
+| Action dimension | 8 |
+| Environment | Isaac-Lift-Needle-PSM-IK-Abs-v0 |
+| Collector | State Machine |
+
 ### Behavior Cloning (BC)
 
 1. Collect demonstrations with state machine for the environment `Isaac-Lift-Needle-PSM-IK-Abs-v0`:
@@ -77,23 +79,29 @@ Each trajectory stores:
 ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/state_machine/lift_needle_sm.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 1 
 ```
 
-2. (Optional) Split the dataset into train and validation set: 
+2. Split the dataset into train and validation set: 
 
 ```bash
 # split data
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/robomimic/tools/split_train_val.py logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/hdf_dataset.hdf5 --ratio 0.2
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/robomimic/tools/split_train_val.py logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/hdf_dataset.hdf5 --ratio 0.1
 ```
 
-3. Train a BC agent for `Isaac-Lift-Needle-PSM-IK-Abs-v0`. `BCPOlicy` was inspired by [Minari](https://minari.farama.org/tutorials/using_datasets/behavioral_cloning/) and [Imitation](https://imitation.readthedocs.io/en/latest/algorithms/bc.html)
+3. Train a BC agent for `Isaac-Lift-Needle-PSM-IK-Abs-v0`. 
 
 ```bash
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/bc_mse_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/robomimic/train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 
 ```
 
-4. Play the learned model to visualize results:
+4. Visualize a trained checkpoint:
 
 ```bash
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/bc_mse_eval.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --checkpoint /PATH/TO/model.pth
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/robomimic/play.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --checkpoint /PATH/TO/model.pth
+```
+
+5. Evaluate trained checkpoints:
+
+```bash
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/robomimic/eval.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --checkpoint_dir logs/robomimic/models
 ```
 
 ## Reinforcement Learning
@@ -103,48 +111,43 @@ Train an agent on `Isaac-Lift-Needle-PSM-IK-Abs-v0` with [RSL-RL](https://github
 
 ```bash
 # run script for training
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/ppo_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --headless
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/ppo.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --headless
 # run script for playing with 32 environments
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/ppo_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 32 
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/ppo.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 32 
 ```
 
-### BC + PPO
+### TD3
 
-Train an agent on `Isaac-Lift-Needle-PSM-IK-Abs-v0`:
 
-```bash
-${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/learning/bc_rsl_train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 1 
-```
 
-### (Optional) TensorBoard: TensorFlow's visualization toolkit 
-
-Monitor the training progress stored in the `logs` directory on [Tensorboard](https://www.tensorflow.org/tensorboard):
-
-```bash
-# execute from the root directory of the repository
-${IsaacLab_PATH}/isaaclab.sh -p -m tensorboard.main --logdir=logs
-```
 
 ## Results
 
-The following results were evaluated on the Lift Needle task. Behavior Cloning policy learns Cartesian motion commands. Gripper actuation is currently controlled by a hand-crafted schedule.
-PPO directly optimizes the manipulation policy through reinforcement learning.
+The following results were evaluated on the Lift Needle task in **50 episodes**. 
 
-| Method | Demonstrations | Success Rate (50 Episodes) |
-|----------|----------|----------|
-| State Machine | N/A | 100% |
-| Behavior Cloning | 100 | 12% |
-| PPO | N/A | 82% |
+| Method | Success Rate |
+|----------|----------|
+| State Machine | 100% |
+| BC (200 demos) | 20% |
+| PPO | 82% |
 
-## Future Improvement
+### BC Training
 
-- Improve current BC and PPO performance
-- Improve BC + PPO initialization
-- DAgger
-- GAIL
+<p align="center">
+<img src="source/standalone/workflows/robomimic/results/bc_200demo_200epoch/figs/loss.png" width="650">
+</p>
+
+Training and validation losses converge rapidly without noticeable overfitting.
+
+## Future Work
+
+- Additional RL algorithms (TD3, SAC)
+- Offline RL (TD3-BC, BCQ)
+- Interactive imitation learning (DAgger)
+- Adversarial imitation learning (GAIL)
 - Diffusion Policy
-- (Optional) VLA
-- (Optional) Sim-to-real
+- Vision-based policy learning
+- Sim-to-real transfer
 
 ## Acknowledgement
 
