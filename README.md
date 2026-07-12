@@ -127,7 +127,7 @@ The following results were evaluated on the Lift Needle task in **50 episodes**.
 
 | Method | Success Rate |
 |----------|----------|
-| State Machine | 100% |
+| State Machine | 68% |
 | BC (200 demos) | 20% |
 | PPO | 82% |
 
