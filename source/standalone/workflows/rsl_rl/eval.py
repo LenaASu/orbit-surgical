@@ -129,15 +129,10 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
             if drop_log == 1:
                 drop_cnt += 1
 
-            # # reset
-            # episode_reward = 0.0
+            # reset
             episode_step = 0
-            # print(info)
-            # print("success:", success_cnt)
-            # print("timeout: ", timeout_cnt)
             episode_id += 1
             obs, info = env.reset()
-
     return {
         "checkpoint": checkpoint_path.name,
         "path": str(checkpoint_path),
