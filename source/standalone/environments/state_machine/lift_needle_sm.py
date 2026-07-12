@@ -28,8 +28,8 @@ parser.add_argument(
 )
 parser.add_argument("--num_envs", type=int, default=1, help="Number of environments to simulate.")
 parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0", help="Name of the task.")
-parser.add_argument("--target_success", type=str, default=100, help="The number of collected demonstrations.")
-save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_100.hdf5"
+parser.add_argument("--target_success", type=str, default=200, help="The number of collected demonstrations.")
+save_path = f"source/standalone/environments/data/datasets/lift_n_dataset_Abs_200.hdf5"
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)

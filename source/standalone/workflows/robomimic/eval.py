@@ -21,10 +21,10 @@ parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0
 parser.add_argument(
     "--checkpoint_dir",
     type=str,
-    default="logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/bc/20260710133703/models",
+    default="logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/bc/20260711214538/model",
     help="Directory contains model_epoch_*.pth checkpoints."
 )
-parser.add_argument("--num_episodes", type=str, default=50, help="Episodes playing for evaluation.")
+parser.add_argument("--num_episodes", type=str, default=100, help="Episodes playing for evaluation.")
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)

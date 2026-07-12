@@ -1,0 +1,6 @@
+checkpoint,path,episodes,success,timeout,drop,mean_success_steps,mean_rewards,mean_episode_length,success_rate
+model_epoch_20.pth,logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/bc/20260711214538/models/model_epoch_20.pth,50,10,40,0,147.5,-7.390422251259443,349.5,20.0
+model_epoch_40.pth,logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/bc/20260711214538/models/model_epoch_40.pth,50,8,42,0,133.625,-5.7388695653365,357.38,16.0
+model_epoch_60.pth,logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/bc/20260711214538/models/model_epoch_60.pth,50,8,41,1,136.875,-6.754131682615261,356.24,16.0
+model_epoch_160.pth,logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/bc/20260711214538/models/model_epoch_160.pth,50,8,42,0,215.25,-5.519849594673142,370.44,16.0
+model_epoch_50.pth,logs/robomimic/Isaac-Lift-Needle-PSM-IK-Abs-v0/bc/20260711214538/models/model_epoch_50.pth,50,7,42,1,126.14285714285714,-4.589242294774158,357.72,14.000000000000002
