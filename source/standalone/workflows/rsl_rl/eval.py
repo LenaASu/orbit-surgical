@@ -35,7 +35,7 @@ parser.add_argument(
 parser.add_argument(
     "--checkpoint_dir",
     type=str,
-    default="logs/rsl_rl/needle_lift/2026-07-05_23-40-21",
+    default="logs/rsl_rl/needle_lift",
 )
 
 FILE_PATH = Path(__file__).resolve().parent
@@ -46,11 +46,6 @@ cli_args.add_rsl_rl_args(parser)
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
-
-# if args_cli.checkpoint is None:
-#     # args_cli.checkpoint = "/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
-#     args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-07-05_23-40-21/model_999.pt"
-#     # args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
 
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
@@ -134,31 +129,6 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
             if drop_log == 1:
                 drop_cnt += 1
 
-            # # print("obs", obs.shape, obs[0, :10])
-            # # print("actions", actions.shape, actions[0])
-            # print(
-            #     # "step:", data["step"],
-            #     "epi_id:", episode_id,
-            #     "epi_step:", episode_step,
-            #     # "action shape:", actions.shape,
-            #     # "action:", actions[0],
-            #     "success:", success_cnt,
-            #     "timeout:", timeout_cnt,
-            #     "terminated:", terminated,
-            #     "truncated:", truncated,
-            #     "object_z:", object_pos[0, 2],
-            #     "ee_z:", actions[:, 2],
-            #     # "action[0,0:3]:", actions[0,0:3],
-            # )
-
-
-            # if episode_id >= num_episodes:
-            #     break
-            
-            # episode_id += 1
-            # total_rewards.append(episode_reward)
-            # episode_lengths.append(episode_step)
-            
             # # reset
             # episode_reward = 0.0
             episode_step = 0
@@ -167,7 +137,7 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
             # print("timeout: ", timeout_cnt)
             episode_id += 1
             obs, info = env.reset()
-            # obs = obs_dict["policy"].to(args_cli.device)
+
     return {
         "checkpoint": checkpoint_path.name,
         "path": str(checkpoint_path),
@@ -177,23 +147,6 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
         "drop": drop_cnt,
         "success_rate": success_cnt / (episode_id - 1) * 100.0
     }
-    # print("-" * 50)
-    # print(f"{'Metric':<25} | {'Value':<15}")
-    # print("-" * 50)
-    # print(f"{'Task':<25} | {args_cli.task:<15}")
-    # print(f"{'Checkpoint':<25} | {Path(args_cli.checkpoint).name:<15}")
-    # print(f"{'Episodes':<25} | {episode_id:<15}")
-    # print(f"{'Success Episodes':<25} | {success_cnt:<15}")
-    # print(f"{'Success Rate':<25} | {success_cnt / episode_id * 100:.1f}%")
-    # print(f"{'Timeout Episodes':<25} | {timeout_cnt:<15}")
-    # print(f"{'Timeout Rate':<25} | {timeout_cnt / episode_id * 100:.1f}%")
-    # # print(f"{'Mean Reward':<25} | {sum(total_rewards) / len(total_rewards):.3f}")
-    # # print(f"{'Mean Episode Length':<25} | {sum(episode_lengths) / len(episode_lengths):.1f}")
-    # if success_steps:
-    #     print(f"{'Mean Success Step':<25} | {sum(success_steps) / len(success_steps):.1f}")
-    # else:
-    #     print(f"{'Mean Success Step':<25} | N/A")
-    # print("-" * 50)
 
 def main():
     checkpoint_dir = Path(args_cli.checkpoint_dir)
@@ -221,8 +174,7 @@ def main():
     
     results = sorted(results, key=lambda x:x["success_rate"], reverse=True)
 
-
-
+    # print summary
     print("\n" + "=" * 70)
     print("Top 5 PPO Checkpoints")
     print("=" * 70)
