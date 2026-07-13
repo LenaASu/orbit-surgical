@@ -1,2 +1,0 @@
-num_trajs,mean_len,std_len,mean_reward,std_reward,worst_idx,best_idx,mean_max_height,std_max_height,mean_final_height,std_final_height
-100,196.62,52.91555689602219,40.32506480790675,38.50345478871997,70,75,0.03307088680565357,0.0017283276099137497,0.014999999664723873,0.0
