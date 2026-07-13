@@ -5,7 +5,8 @@ from pathlib import Path
 TOOLS_DIR = Path(__file__).resolve().parent
 ROBOMIMIC_DIR = TOOLS_DIR.parent
 
-RESULT_DIR = ROBOMIMIC_DIR / "results" / "bc_200demo_50epo" / "tb_csv"
+RESULT_DIR = ROBOMIMIC_DIR / "results" / "bc_200demo_200epoch" 
+CSV_DIR = RESULT_DIR / "tb_csv"
 save_path = RESULT_DIR / "figs" / "loss.png"
 save_path_grad = RESULT_DIR / "figs" / "policy_grad_norm.png"
 
@@ -15,7 +16,7 @@ def plot_loss(train_df, valid_df, save_path):
     plt.plot(valid_df['Step'], valid_df['Value'], label='Validation Loss', color="#D4666F", linewidth=2)
 
     plt.title("Training and Validation Loss", fontsize=14)
-    plt.xlim(0, 200)
+    # plt.xlim(0, 200)
     plt.xlabel("Epochs", fontsize=12)
     plt.ylabel("Loss", fontsize=12)
     plt.grid(True, linestyle='--', alpha=0.6)
@@ -30,7 +31,7 @@ def plot_policy_grad_norm(df, save_path_grad):
     plt.plot(df['Step'], df['Value'], label='Policy Grad Norm', color="#7DAEE0", linewidth=2)
 
     plt.title("Training Policy Grad Norms", fontsize=14)
-    plt.xlim(0, 200)
+    # plt.xlim(0, 200)
     plt.xlabel("Epochs", fontsize=12)
     plt.ylabel("Grad Norms", fontsize=12)
     plt.grid(True, linestyle='--', alpha=0.6)
@@ -41,9 +42,9 @@ def plot_policy_grad_norm(df, save_path_grad):
 
 def main():
    
-    train_loss_df = pd.read_csv(RESULT_DIR / "train_loss.csv")
-    valid_loss_df = pd.read_csv(RESULT_DIR / "valid_loss.csv")
-    norm_df = pd.read_csv(RESULT_DIR / "train_policy_grad_norm.csv")
+    train_loss_df = pd.read_csv(CSV_DIR / "train_loss.csv")
+    valid_loss_df = pd.read_csv(CSV_DIR / "valid_loss.csv")
+    norm_df = pd.read_csv(CSV_DIR / "train_policy_grad_norm.csv")
 
     save_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -54,4 +55,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
