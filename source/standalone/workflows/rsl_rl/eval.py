@@ -4,9 +4,9 @@ Script to run PPO policies to pick and lift the suture needle and save the polic
 
 .. code-block:: bash
 
-    ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/environments/imitation_learning/ppo_eval.py
+    ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/rsl_rl/eval.py
 
-    ~/IsaacLab/isaaclab.sh -p source/standalone/environments/imitation_learning/ppo_eval.py 
+    ~/IsaacLab/isaaclab.sh -p source/standalone/workflows/rsl_rl/eval.py
   
 """
 
@@ -25,6 +25,7 @@ parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
 parser.add_argument("--num_envs", type=int, default=1, help="Number of environments to simulate.")
+parser.add_argument("--num_episodes", type=int, default=50, help="Number of episodes to simulate.")
 parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
 parser.add_argument(
     "--task", 
@@ -94,15 +95,7 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
     timeout_cnt = 0
     drop_cnt = 0
 
-    num_episodes = 50 # set number of episodes
-  
-    success_steps = []
-    episode_reward = 0.0
-    total_rewards = []
-    episode_lengths = []
-
-
-    while simulation_app.is_running() and episode_id <= num_episodes:
+    while simulation_app.is_running() and episode_id <= args_cli.num_episodes:
         
         # run everything in inference mode
         with torch.inference_mode():
@@ -110,7 +103,6 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
             actions = policy(obs)
         obs, rewards, dones, info = env.step(actions)
 
-        # episode_reward += rewards.mean().item()
         episode_step += 1
         step_cnt += 1
         if step_cnt % 100 == 0:
@@ -129,12 +121,8 @@ def eval_checkpoint_ppo(env, agent_cfg, checkpoint_path):
             if drop_log == 1:
                 drop_cnt += 1
 
-            # # reset
-            # episode_reward = 0.0
+            # reset
             episode_step = 0
-            # print(info)
-            # print("success:", success_cnt)
-            # print("timeout: ", timeout_cnt)
             episode_id += 1
             obs, info = env.reset()
 
@@ -187,7 +175,6 @@ def main():
             f"drop={r['drop']}"
         )
     print("=" * 70)
-    rows = []
 
     df = pd.DataFrame(results[:5])
     df.to_csv(save_path, index=False)
