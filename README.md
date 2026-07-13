@@ -139,6 +139,16 @@ The following results were evaluated on the Lift Needle task in **50 episodes**.
 
 Training and validation losses converge rapidly without noticeable overfitting.
 
+### PPO Training
+
+<p align="center">
+  <img src="source/standalone/workflows/rsl_rl/results/figs/object_lifted.png" width="48%">
+  <img src="source/standalone/workflows/rsl_rl/results/figs/train_mean_reward.png" width="48%">
+</p>
+
+During training, the number of successful episode terminations per rollout increases steadily, indicating that the policy gradually learns reliable needle lifting behaviors. Around episode 430, the mean training reward temporarily drops as the policy explores new strategies. After learning successful grasping and lifting behaviors, the reward steadily recovers and converges.
+
+
 ## Future Work
 
 - Additional RL algorithms (TD3, SAC)
