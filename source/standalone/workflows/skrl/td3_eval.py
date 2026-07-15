@@ -4,9 +4,9 @@ Script to run TD3 policies to pick and lift the suture needle and save the polic
 
 .. code-block:: bash
 
-    ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/skrl/eval_td3.py
+    ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/skrl/td3_eval.py
 
-    ~/IsaacLab/isaaclab.sh -p source/standalone/workflows/skrl/eval_td3.py
+    ~/IsaacLab/isaaclab.sh -p source/standalone/workflows/skrl/td3_eval.py
   
 """
 
@@ -33,23 +33,17 @@ parser.add_argument(
 parser.add_argument(
     "--checkpoint_dir",
     type=str,
-    # default="/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test",
-    default="/home/lena/Documents/GitHub/orbit-surgical/logs/skrl/lift/2026-07-06_17-45-59_td3_torch/checkpoints",
+    default="logs/skrl/lift/2026-07-06_17-45-59_td3_torch/checkpoints",
 )
 parser.add_argument("--algorithm", type=str, default="TD3")
 parser.add_argument("--ml_framework", type=str, default="torch", choices=["torch", "jax"])
 
 FILE_PATH = Path(__file__).resolve().parent
-save_path = FILE_PATH / "results" / "td3_top5.csv"
+save_path = FILE_PATH / "results" / "eval" / "td3_top5.csv"
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
-
-# if args_cli.checkpoint is None:
-#     # args_cli.checkpoint = "/workspace_data/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
-#     args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/2026-07-05_23-40-21/model_999.pt"
-#     # args_cli.checkpoint = "/home/lena/Documents/GitHub/orbit-surgical/logs/rsl_rl/needle_lift/test/model_1000.pt"
 
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
