@@ -1,0 +1,6 @@
+checkpoint,path,success,timeout,drop,success_rate
+agent_33600.pt,logs/skrl/lift/2026-08-18_13-36-19_td3_torch/checkpoints/agent_33600.pt,3,47,0,6.0
+agent_58800.pt,logs/skrl/lift/2026-08-18_13-36-19_td3_torch/checkpoints/agent_58800.pt,3,46,1,6.0
+agent_30000.pt,logs/skrl/lift/2026-08-18_13-36-19_td3_torch/checkpoints/agent_30000.pt,2,47,1,4.0
+agent_40800.pt,logs/skrl/lift/2026-08-18_13-36-19_td3_torch/checkpoints/agent_40800.pt,2,48,0,4.0
+agent_80400.pt,logs/skrl/lift/2026-08-18_13-36-19_td3_torch/checkpoints/agent_80400.pt,2,48,0,4.0

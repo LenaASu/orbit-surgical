@@ -122,12 +122,12 @@ agent:
   exploration_noise: GaussianNoise
   exploration_noise_kwargs:
     mean: 0.0
-    std: 0.1
+    std: 0.01
   smooth_regularization_noise: GaussianNoise
   smooth_regularization_noise_kwargs:
     mean: 0.0
-    std: 0.2
-  smooth_regularization_clip: 0.5
+    std: 0.02
+  smooth_regularization_clip: 0.05
   observation_preprocessor: "RunningStandardScaler"
   observation_preprocessor_kwargs: null
   # rewards_shaper_scale: 0.01

@@ -233,20 +233,32 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             dtype=np.float32,
         )
 
+    print("Env action space:", env.action_space)
+    print("Action low:", env.action_space.low)
+    print("Action high:", env.action_space.high)
+    print("Action shape:", env.action_space.shape)
+    print("Action dim:", env.action_space.shape[0])
+
     # configure and instantiate the skrl runner
     # https://skrl.readthedocs.io/en/latest/api/utils/runner.html
     runner = Runner(env, agent_cfg)
+
+    print("TD3 min actions:", runner.agent._min_actions)
+    print("TD3 max actions:", runner.agent._max_actions)
 
     # Patch action bounds for TD3
     # Lift Needle action dim = 8, normalized action range = [-1, 1]
     if algorithm == "td3":
         import torch
 
-        action_dim = 8
+        action_dim = env.action_space.shape[0]
         device = env.device
 
         runner.agent._min_actions = torch.full((action_dim,), -1.0, device=device)
         runner.agent._max_actions = torch.full((action_dim,), 1.0, device=device)
+
+        print("TD3 patched min actions:", runner.agent._min_actions)
+        print("TD3 patched max actions:", runner.agent._max_actions)
 
     # load checkpoint (if specified)
     if resume_path:

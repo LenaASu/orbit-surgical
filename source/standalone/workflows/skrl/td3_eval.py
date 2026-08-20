@@ -33,7 +33,7 @@ parser.add_argument(
 parser.add_argument(
     "--checkpoint_dir",
     type=str,
-    default="logs/skrl/lift/2026-07-06_17-45-59_td3_torch/checkpoints",
+    default="logs/skrl/lift/2026-08-18_13-36-19_td3_torch/checkpoints",
 )
 parser.add_argument("--algorithm", type=str, default="TD3")
 parser.add_argument("--ml_framework", type=str, default="torch", choices=["torch", "jax"])
@@ -80,15 +80,23 @@ from isaaclab.envs import (
     multi_agent_to_single_agent,
 )
 
+import copy
 from isaaclab_rl.skrl import SkrlVecEnvWrapper
 import isaaclab.app  # noqa: F401
 from isaaclab_tasks.utils import load_cfg_from_registry, parse_env_cfg
 
+# from isaaclab.assets import RigidObject
+from isaaclab.assets.rigid_object.rigid_object_data import RigidObjectData
+# from isaaclab.utils.math import subtract_frame_transforms
 
 import orbit.surgical.tasks  # noqa: F401
 
 def eval_checkpoint_td3(env, agent_cfg, checkpoint_path):
-    runner = Runner(env, agent_cfg)
+    # set memory_size to 1 to reduce replay buffer
+    eval_cfg = copy.deepcopy(agent_cfg)
+    eval_cfg["memory"]["memory_size"] = 1
+
+    runner = Runner(env, eval_cfg)
 
     # Patch TD3 action bounds
     runner.agent._min_actions = torch.full((8,), -1.0, device=env.device)
@@ -97,6 +105,10 @@ def eval_checkpoint_td3(env, agent_cfg, checkpoint_path):
     runner.agent.load(str(checkpoint_path))
 
     obs, info = env.reset()
+
+    
+    rows = [] # records of each timestep
+    results = [] # records of each checkpoint
 
     episode_id = 1
     episode_step = 0
@@ -109,11 +121,70 @@ def eval_checkpoint_td3(env, agent_cfg, checkpoint_path):
 
     while simulation_app.is_running() and episode_id <= num_episodes:
         with torch.inference_mode():
-            actions = runner.agent.act(obs, states=None, timestep=0, timesteps=0)
+            actions = runner.agent.act(obs, states=None, timestep=100000, timesteps=100000)
             action = actions[0]
             
         obs, rewards, terminated, truncated, info = env.step(action)
         dones = terminated | truncated
+
+        # observations
+        # robot: RigidObject = env.scene["robot"]
+        # -- end-effector frame
+        ee_frame_sensor = env.scene["ee_frame"]
+        tcp_rest_position = ee_frame_sensor.data.target_pos_w[..., 0, :].clone() - env.scene.env_origins
+        # tcp_rest_position_b, _ = subtract_frame_transforms(
+        #     robot.data.root_state_w[:, :3], robot.data.root_state_w[:, 3:7], tcp_rest_position
+        # )
+        # tcp_rest_orientation = ee_frame_sensor.data.target_quat_w[..., 0, :].clone()
+        # -- object frame
+        object_data: RigidObjectData = env.scene["object"].data
+        object_position = object_data.root_pos_w - env.scene.env_origins
+        # object_position_b, _ = subtract_frame_transforms(
+        #     robot.data.root_state_w[:, :3], robot.data.root_state_w[:, 3:7], object_position
+        # )
+        # object_orientation = object_data.root_quat_w
+        # # -- target object frame
+        # # desired_pose = env.unwrapped.command_manager.get_command("object_pose")
+        # desired_pose = env.command_manager.get_command("object_pose")
+
+        action_cpu = action[0].detach().cpu().numpy()
+        # print("actions:", actions)
+        # print("action:", action)
+        # print("action_cpu:", action_cpu)
+        ee_cpu = tcp_rest_position[0].detach().cpu().numpy()
+        object_cpu = object_position[0].detach().cpu().numpy()
+        reward_cpu = rewards[0].detach().cpu().item()
+
+        # print(type(actions))
+        # print(len(actions))
+        # print(action.shape)
+        # print(action_cpu.shape)
+
+        rows.append({
+            "checkpoint": checkpoint_path.name,
+            "episode": episode_id,
+            "step": episode_step,
+
+            "action_0": float(action_cpu[0]),
+            "action_1": float(action_cpu[1]),
+            "action_2": float(action_cpu[2]),
+            "action_3": float(action_cpu[3]),
+            "action_4": float(action_cpu[4]),
+            "action_5": float(action_cpu[5]),
+            "action_6": float(action_cpu[6]),
+            "gripper": float(action_cpu[7]),
+
+            "ee_x": float(ee_cpu[0]),
+            "ee_y": float(ee_cpu[1]),
+            "ee_z": float(ee_cpu[2]),
+
+            "object_x": float(object_cpu[0]),
+            "object_y": float(object_cpu[1]),
+            "object_z": float(object_cpu[2]),
+
+            "ee_object_distance": float(np.linalg.norm(ee_cpu - object_cpu)),
+            "reward": reward_cpu,
+        })
 
         episode_step += 1
         step_cnt += 1
@@ -138,15 +209,55 @@ def eval_checkpoint_td3(env, agent_cfg, checkpoint_path):
             obs, info = env.reset()
 
     episodes = episode_id - 1
-    return {
+
+    # rows.append({
+    #         "checkpoint": checkpoint_path.name,
+    #         "episode": episode_id,
+    #         "step": episode_step,
+    
+    #         "action_0": action_cpu[0],
+    #         "action_1": action_cpu[1],
+    #         "action_2": action_cpu[2],
+    #         "action_3": action_cpu[3],
+    #         "action_4": action_cpu[4],
+    #         "action_5": action_cpu[5],
+    #         "action_6": action_cpu[6],
+    #         "gripper": action_cpu[7],
+    
+    #         "ee_x": ee_cpu[0],
+    #         "ee_y": ee_cpu[1],
+    #         "ee_z": ee_cpu[2],
+    
+    #         "object_x": object_cpu[0],
+    #         "object_y": object_cpu[1],
+    #         "object_z": object_cpu[2],
+    
+    #         "reward": rewards,
+    #     })
+
+    results.append({
         "checkpoint": checkpoint_path.name,
         "path": str(checkpoint_path),
-        "episodes": episodes,
         "success": success_cnt,
         "timeout": timeout_cnt,
         "drop": drop_cnt,
         "success_rate": success_cnt / episodes * 100.0 if episodes > 0 else 0.0,
-    }
+    })
+    
+    # return {
+    #     "checkpoint": checkpoint_path.name,
+    #     "path": str(checkpoint_path),
+    #     "episodes": episodes,
+    #     "8D action": actions,
+    #     "ee_pos": tcp_rest_position.detach().cpu(),
+    #     "object_pos": object_position.detach().cpu(),
+    #     "success": success_cnt,
+    #     "timeout": timeout_cnt,
+    #     "drop": drop_cnt,
+    #     "reward": rewards,
+    #     "success_rate": success_cnt / episodes * 100.0 if episodes > 0 else 0.0,
+    # }
+    return rows, results
 
 def main():
     checkpoint_dir = Path(args_cli.checkpoint_dir)
@@ -161,18 +272,22 @@ def main():
     checkpoint_dir.glob("agent_*.pt"),
         key=lambda p: int(p.stem.split("_")[1]),
     )
+    
+    rows = []
     results = []
 
     for checkpoint_path in checkpoint_files:
         print(f"\n[INFO] Evaluating {checkpoint_path.name}")
-        result = eval_checkpoint_td3(env=env, agent_cfg=agent_cfg, checkpoint_path=checkpoint_path)
-        results.append(result)
+        ckpt_rows, ckpt_results = eval_checkpoint_td3(env=env, agent_cfg=agent_cfg, checkpoint_path=checkpoint_path)
+        rows.extend(ckpt_rows)
+        results.extend(ckpt_results)
+        # print(results)
 
-        print(f"{result['checkpoint']}:")
-        print(f"success {result['success']}/{result['episodes']}")
-        print(f"{result['success_rate']:.1f}%")
-        print(f"timeout {result['timeout']}")
-        print(f"drop {result['drop']}")
+        # print(f"{result['checkpoint']}:")
+        # print(f"success {result['success']}/{result['episodes']}")
+        # print(f"{result['success_rate']:.1f}%")
+        # print(f"timeout {result['timeout']}")
+        # print(f"drop {result['drop']}")
     
     results = sorted(results, key=lambda x:x["success_rate"], reverse=True)
 
@@ -184,15 +299,24 @@ def main():
         print(
             f"{i}. {r['checkpoint']:<15} "
             f"success_rate={r['success_rate']:.1f}% "
-            f"success={r['success']}/{r['episodes']} "
+            f"success={r['success']} "
             f"timeout={r['timeout']} "
             f"drop={r['drop']}"
         )
     print("=" * 70)
-    rows = []
 
+    # save files
     df = pd.DataFrame(results[:5])
     df.to_csv(save_path, index=False)
+
+    trajectory_save_path = (
+        FILE_PATH / "results" / "eval" / "td3_trajectories.csv"
+        )
+
+    trajectory_df = pd.DataFrame(rows)
+    trajectory_df.to_csv(trajectory_save_path, index=False)
+
+    print(f"Saved trajectories to: {trajectory_save_path}")
 
     # close the simulator
     env.close()
