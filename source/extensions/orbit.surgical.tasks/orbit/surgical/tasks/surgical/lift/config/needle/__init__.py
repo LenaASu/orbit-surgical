@@ -75,6 +75,7 @@ gym.register(
     kwargs={
         "env_cfg_entry_point": ik_rel_env_cfg.NeedleLiftEnvCfg,
         "rsl_rl_cfg_entry_point": agents.rsl_rl_cfg.LiftNeedlePPORunnerCfg,
+        "skrl_td3_cfg_entry_point": "source/extensions/orbit.surgical.tasks/orbit/surgical/tasks/surgical/lift/config/needle/agents/skrl_td3_cfg.yaml"
     },
     disable_env_checker=True,
 )

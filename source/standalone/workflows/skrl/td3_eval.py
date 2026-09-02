@@ -27,13 +27,13 @@ parser.add_argument("--seed", type=int, default=None, help="Seed used for the en
 parser.add_argument(
     "--task", 
     type=str, 
-    default="Isaac-Lift-Needle-PSM-IK-Abs-v0", 
+    default="Isaac-Lift-Needle-PSM-IK-Rel-v0", 
     help="Name of the task."
 )
 parser.add_argument(
     "--checkpoint_dir",
     type=str,
-    default="logs/skrl/lift/2026-08-18_13-36-19_td3_torch/checkpoints",
+    default="logs/skrl/lift/2026-08-22_15-36-33_td3_torch/best",
 )
 parser.add_argument("--algorithm", type=str, default="TD3")
 parser.add_argument("--ml_framework", type=str, default="torch", choices=["torch", "jax"])
@@ -97,16 +97,17 @@ def eval_checkpoint_td3(env, agent_cfg, checkpoint_path):
     eval_cfg["memory"]["memory_size"] = 1
 
     runner = Runner(env, eval_cfg)
-
-    # Patch TD3 action bounds
-    runner.agent._min_actions = torch.full((8,), -1.0, device=env.device)
-    runner.agent._max_actions = torch.full((8,), 1.0, device=env.device)
-
     runner.agent.load(str(checkpoint_path))
 
-    obs, info = env.reset()
+    action_dim = env.action_space.shape[-1]
 
+    # Patch TD3 action bounds
+    runner.agent._min_actions = torch.full((action_dim,), -1.0, device=env.device)
+    runner.agent._max_actions = torch.full((action_dim,), 1.0, device=env.device)
     
+    obs, info = env.reset()
+    print("env action_manager", env.action_manager)
+
     rows = [] # records of each timestep
     results = [] # records of each checkpoint
 
@@ -165,14 +166,16 @@ def eval_checkpoint_td3(env, agent_cfg, checkpoint_path):
             "episode": episode_id,
             "step": episode_step,
 
+            # 8D action: x,y,z,qw,qx,qy,qz,gripper
+            # 7D action: x,y,z,drx,dry,drz,gripper
             "action_0": float(action_cpu[0]),
             "action_1": float(action_cpu[1]),
             "action_2": float(action_cpu[2]),
             "action_3": float(action_cpu[3]),
             "action_4": float(action_cpu[4]),
             "action_5": float(action_cpu[5]),
-            "action_6": float(action_cpu[6]),
-            "gripper": float(action_cpu[7]),
+            # "action_6": float(action_cpu[6]),
+            "gripper": float(action_cpu[6]),
 
             "ee_x": float(ee_cpu[0]),
             "ee_y": float(ee_cpu[1]),

@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-FILE_PATH = "source/standalone/workflows/skrl/results/eval/td3_trajectories.csv"
+FILE_PATH = "logs/skrl/lift/2026-08-18_13-36-19_td3_torch/td3_trajectories_0818.csv"
 SAVE_PATH = Path("source/standalone/workflows/skrl/results/figs")
 SAVE_PATH.mkdir(parents=True, exist_ok=True)
 
@@ -72,5 +72,17 @@ def plot_gripper_action(success, failure):
     plt.show()
     plt.close()
 
-plot_success_failure(success, failure)
-plot_gripper_action(success, failure)
+def plot_all_dim(failure):
+    for i in range(7):
+        plt.figure()
+        plt.plot(failure["step"], failure[f"action_{i}"])
+        plt.xlabel("Step")
+        plt.ylabel(f"Action {i}")
+        plt.title(f"Failure Episode - Action {i}")
+        plt.grid(True)
+        plt.savefig(SAVE_PATH / f"gripper_action_{i}.png", dpi=300, bbox_inches="tight")
+        # plt.show()
+
+# plot_success_failure(success, failure)
+# plot_gripper_action(success, failure)
+plot_all_dim(failure)

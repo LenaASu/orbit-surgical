@@ -23,7 +23,7 @@ parser.add_argument("--video", action="store_true", default=False, help="Record 
 parser.add_argument("--video_length", type=int, default=200, help="Length of the recorded video (in steps).")
 parser.add_argument("--video_interval", type=int, default=2000, help="Interval between video recordings (in steps).")
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
-parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Abs-v0", help="Name of the task.")
+parser.add_argument("--task", type=str, default="Isaac-Lift-Needle-PSM-IK-Rel-v0", help="Name of the task.")
 parser.add_argument(
     "--agent",
     type=str,
@@ -233,6 +233,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             dtype=np.float32,
         )
 
+    print("Env action manager:", env.action_manager)
     print("Env action space:", env.action_space)
     print("Action low:", env.action_space.low)
     print("Action high:", env.action_space.high)

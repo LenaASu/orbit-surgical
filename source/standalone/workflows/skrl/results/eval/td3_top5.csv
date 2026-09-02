@@ -1,0 +1,2 @@
+checkpoint,path,success,timeout,drop,success_rate
+agent_00.pt,logs/skrl/lift/2026-08-22_15-36-33_td3_torch/best/agent_00.pt,0,50,0,0.0
