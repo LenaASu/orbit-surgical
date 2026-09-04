@@ -1,2 +1,0 @@
-checkpoint,path,success,timeout,drop,success_rate
-agent_24000.pt,logs/skrl/lift/2026-07-14_21-58-44_td3_torch/test/agent_24000.pt,0,50,0,0.0
