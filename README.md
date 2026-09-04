@@ -1,14 +1,13 @@
 
 # Learning-Based Surgical Needle Manipulation in ORBIT-Surgical
 
-[![IsaacSim](https://img.shields.io/badge/IsaacSim-4.5.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
-[![Isaac Lab](https://img.shields.io/badge/IsaacLab-2.x-silver)](https://isaac-sim.github.io/IsaacLab)
-[![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
-[![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-orange.svg)](https://releases.ubuntu.com/22.04/)
+[![Python](https://img.shields.io/badge/Python-3.10-blue.svg)](...)
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-orange.svg)](...)
+[![Docker](https://img.shields.io/badge/Docker-Tested-blue.svg)](...)
 
 ## Overview
 
-This repository extends the ORBIT-Surgical framework with a complete learning pipeline for surgical needle manipulation in Isaac Lab. The pipeline includes a state-machine baseline, automatic demonstration collection, imitation learning with RoboMimic, reinforcement learning with RSL-RL, and automatic checkpoint evaluation on the Lift Needle benchmark.
+This repository extends the ORBIT-Surgical framework with a complete learning pipeline for surgical needle manipulation in Isaac Lab. The pipeline includes a state-machine baseline, automatic demonstration collection, imitation learning with RoboMimic, reinforcement learning with RSL-RL (PPO) and skrl (TD3), and automatic checkpoint evaluation on the Lift Needle benchmark.
 
 ### Highlights
 
@@ -16,22 +15,59 @@ This repository extends the ORBIT-Surgical framework with a complete learning pi
 - Automatic HDF5 demonstration dataset generation 
 - RoboMimic Behavior Cloning (BC)
 - RSL-RL Proximal Policy Optimization (PPO)
-- Skrl Twin-Delayed Deep Deterministic (TD3)
+- skrl Twin Delayed Deep Deterministic Policy Gradient (TD3)
 - Automatic checkpoint evaluation
-- Policy performance comparison
 
 ### Pipeline
 
 
+## Compatibility
+
+The project has been tested with the following Isaac Sim and Isaac Lab configurations:
+
+| Isaac Sim | Isaac Lab | 
+| --------- | --------- | 
+| 4.5.0     | 2.1.0       |
+| 5.0.0       | 2.2.1     | 
 
 ## Setup
 
-Once you are in the virtual environment, you do not need to use `${IsaacLab_PATH}/isaaclab.sh -p` to run python scripts. You can use the default python executable in your environment by running `python` or `python3`. However, for the rest of the documentation, we will assume that you are using `${IsaacLab_PATH}/isaaclab.sh -p` to run python scripts.
+### (Optional) Docker
 
-<!-- Download and install the [Git Large File Storage (LFS)](https://git-lfs.com/). Once downloaded and installed, set up Git LFS for your user account by running:
+The project has also been tested using the NVIDIA Isaac Lab Docker container. The following configuration uses the Isaac Lab 2.1.0 container with NVIDIA GPU and X11 display support.
+
 ```bash
-git lfs install
-``` -->
+# Allow the Docker container to access the X11 display
+xhost +local:docker
+
+# Start the Isaac Lab container
+docker run -it \
+    --gpus all \
+    --runtime=nvidia \
+    --network host \
+    --ipc host \
+    --entrypoint /bin/bash \
+    -e DISPLAY=:0 \
+    -e ACCEPT_EULA=Y \
+    -e PRIVACY_CONSENT=Y \
+    -e NVIDIA_VISIBLE_DEVICES=all \
+    -e NVIDIA_DRIVER_CAPABILITIES=all \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -v $HOME/workspace:/workspace_data \
+    -w /workspace_data \
+    --name isaac-lab \
+    nvcr.io/nvidia/isaac-lab:2.1.0
+```
+
+The host directory `$HOME/workspace` is mounted to `/workspace_data` inside the container, allowing project files (such as this repository), training logs, and checkpoints to persist outside the container.
+
+After exiting the container, revoke X11 access on the host:
+
+```bash
+xhost -local:docker
+```
+
+### General
 
 Clone this repository to a directory **outside** the Isaac Lab installation directory:
 
@@ -58,7 +94,7 @@ git clone https://github.com/LenaASu/orbit-surgical.git
 The state machine baseline successfully grasps and lifts a suture needle and is used to generate demonstration trajectories for imitation learning.
 
 ## Imitation Learning
-### Dataset
+### Datasets
 The demonstrations are automatically converted into a RoboMimic-compatible HDF5 dataset for offline imitation learning.
 
 | Item | Value |
@@ -110,24 +146,31 @@ Train an agent on `Isaac-Lift-Needle-PSM-IK-Abs-v0`:
 ```bash
 # run script for training
 ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/rsl_rl/train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --headless
-# run script for playing with 32 environments
+# run script for training with 32 environments
 ${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/rsl_rl/train.py --task Isaac-Lift-Needle-PSM-IK-Abs-v0 --num_envs 32 
 ```
 
 ### TD3
 
+Train an agent on `Isaac-Lift-Needle-PSM-IK-Rel-v0`:
 
-
+```bash
+# run script for training
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/skrl/td3_train.py --task Isaac-Lift-Needle-PSM-IK-Rel-v0 --headless
+# run script for training with 32 environments
+${IsaacLab_PATH}/isaaclab.sh -p source/standalone/workflows/skrl/td3_train.py --task Isaac-Lift-Needle-PSM-IK-Rel-v0 --num_envs 32 
+```
 
 ## Results
 
 The following results were evaluated on the Lift Needle task in **50 episodes**. 
 
-| Method | Success Rate |
-|----------|----------|
-| State Machine | 68% |
-| BC (200 demos) | 20% |
-| PPO | 82% |
+| Method | Action Formulation | Success Rate |
+|----------|-------------------|-------------|
+| State Machine | Absolute IK | 68% |
+| BC (200 demos) | Absolute IK | 20% |
+| PPO | Absolute IK | **82%** |
+| TD3 | Relative IK | 10% |
 
 ### BC Training
 
@@ -149,7 +192,7 @@ During training, the number of successful episode terminations per rollout incre
 
 ## Future Work
 
-- Additional RL algorithms (TD3, SAC)
+- Additional RL algorithms (SAC)
 - Offline RL (TD3-BC, BCQ)
 - Interactive imitation learning (DAgger)
 - Adversarial imitation learning (GAIL)
@@ -157,12 +200,12 @@ During training, the number of successful episode terminations per rollout incre
 - Vision-based policy learning
 - Sim-to-real transfer
 
-## Acknowledgement
+## Acknowledgements
+
+This project is built upon ORBIT-Surgical [framework](https://github.com/orbit-surgical/orbit-surgical) and its associated [paper](https://arxiv.org/abs/2404.16027).
 
 NVIDIA Isaac Sim is available freely under [individual license](https://www.nvidia.com/en-us/omniverse/download/). For more information about its license terms, please check [here](https://docs.omniverse.nvidia.com/app_isaacsim/common/NVIDIA_Omniverse_License_Agreement.html#software-support-supplement).
 
 Isaac Lab is released under [BSD-3-Clause License](https://github.com/isaac-sim/IsaacLab/blob/main/LICENSE).
 
 Project template is partially from [Template for Isaac Lab Projects](https://github.com/isaac-sim/IsaacLabExtensionTemplate).
-
-ORBIT-Surgical [framework](https://github.com/orbit-surgical/orbit-surgical) and [paper](https://arxiv.org/abs/2404.16027).
